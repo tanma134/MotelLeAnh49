@@ -1,0 +1,376 @@
+﻿@model IEnumerable<MotelLeAnh49.Models.Room>
+@{
+    ViewData["Title"] = "Trang chủ";
+}
+<style>
+    .about-img {
+        width: 100%;
+        height: 500px;
+        object-fit: cover;
+        border-radius: 12px;
+        box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+    }
+</style>
+<!-- HERO SLIDER -->
+<div id="heroCarousel" class="carousel slide hero-slider" data-bs-ride="carousel" data-bs-interval="5000">
+    <div class="carousel-indicators">
+        <button type="button" data-bs-target="#heroCarousel" data-bs-slide-to="0" class="active"></button>
+        <button type="button" data-bs-target="#heroCarousel" data-bs-slide-to="1"></button>
+        <button type="button" data-bs-target="#heroCarousel" data-bs-slide-to="2"></button>
+    </div>
+
+    <div class="carousel-inner">
+        
+            <div class="carousel-item active">
+                <img src="@Url.Content("~/images/rooms/ninhkieu.jpg")"
+                     alt="Ben Ninh Kieu Can Tho">
+                <div class="carousel-overlay">
+                    <h1 class="fade-in-up">MOTEL LÊ ANH 49</h1>
+                    <p class="fade-in-up">Gần Bến Ninh Kiều - Trung tâm Cần Thơ</p>
+                    <a href="#booking" class="btn btn-gold fade-in-up">Đặt phòng ngay</a>
+                </div>
+            </div>
+     
+
+        <div class="carousel-item">
+            <img src="@Url.Content("~/images/rooms/chonoicairang.jpg")"
+                 alt="Cho Noi Cai Rang Can Tho">
+            <div class="carousel-overlay">
+                <h1 class="fade-in-up">CHỢ NỔI CÁI RĂNG</h1>
+                <p class="fade-in-up">Trải nghiệm nét văn hóa sông nước đặc trưng miền Tây</p>
+                <a href="#rooms" class="btn btn-gold fade-in-up">Khám phá phòng</a>
+            </div>
+        </div>
+
+        <div class="carousel-item">
+            <img src="@Url.Content("~/images/rooms/chodemninhkieu.jpg")"
+                 alt="Cho Dem Ninh Kieu Can Tho">
+            <div class="carousel-overlay">
+                <h1 class="fade-in-up">CHỢ ĐÊM NINH KIỀU</h1>
+                <p class="fade-in-up">Thiên đường ẩm thực và mua sắm sôi động giữa lòng Cần Thơ</p>
+                <a href="#rooms" class="btn btn-gold fade-in-up">Khám phá phòng</a>
+            </div>
+        </div>
+
+    </div>
+
+    <button class="carousel-control-prev" type="button" data-bs-target="#heroCarousel" data-bs-slide="prev">
+        <span class="carousel-control-prev-icon"></span>
+    </button>
+    <button class="carousel-control-next" type="button" data-bs-target="#heroCarousel" data-bs-slide="next">
+        <span class="carousel-control-next-icon"></span>
+    </button>
+</div>
+
+<!-- BOOKING FORM SECTION -->
+<section class="booking-section" id="booking">
+    <div class="container">
+        <div class="booking-form">
+            <h3>
+                <i class="fas fa-calendar-check me-2"></i>
+                Đặt phòng trực tuyến
+            </h3>
+            <form>
+                <div class="row g-3">
+                    <div class="col-md-3">
+                        <label class="form-label">Ngày nhận phòng</label>
+                        <input type="date" class="form-control" required>
+                    </div>
+                    <div class="col-md-3">
+                        <label class="form-label">Ngày trả phòng</label>
+                        <input type="date" class="form-control" required>
+                    </div>
+                    <div class="col-md-2">
+                        <label class="form-label">Người lớn</label>
+                        <select class="form-select">
+                            <option value="1">1</option>
+                            <option value="2" selected>2</option>
+                            <option value="3">3</option>
+                            <option value="4">4</option>
+                        </select>
+                    </div>
+                    <div class="col-md-2">
+                        <label class="form-label">Trẻ em</label>
+                        <select class="form-select">
+                            <option value="0" selected>0</option>
+                            <option value="1">1</option>
+                            <option value="2">2</option>
+                            <option value="3">3</option>
+                        </select>
+                    </div>
+                    <div class="col-md-2 d-flex align-items-end">
+                        <button type="submit" class="btn btn-gold w-100">
+                            <i class="fas fa-search me-2"></i>Tìm phòng
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</section>
+
+<!-- ABOUT SECTION -->
+<section class="about-section">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-lg-6 mb-4 mb-lg-0">
+                <div class="row">
+                    <div class="col-6">
+                        <img src="@Url.Content("~/images/rooms/anhnhanghi.jpg")"
+                             class="about-img">
+                    </div>
+                    <div class="col-6">
+                        <img src="@Url.Content("~/images/rooms/anhdem.jpg")"
+                             class="about-img">
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-6 about-content">
+                <h3>Chào mừng đến với Motel Lê Anh 49</h3>
+                <p>
+                    Với hơn 10 năm kinh nghiệm trong lĩnh vực khách sạn và dịch vụ lưu trú,
+                    Motel Lê Anh 49 tự hào là địa chỉ tin cậy cho mọi nhu cầu nghỉ ngơi của bạn.
+                </p>
+                <p>
+                    Chúng tôi cung cấp các phòng nghỉ được thiết kế hiện đại, trang bị đầy đủ tiện nghi,
+                    kết hợp với đội ngũ nhân viên chuyên nghiệp, tận tâm luôn sẵn sàng phục vụ 24/7.
+                </p>
+                <ul class="about-features">
+                    <li><i class="fas fa-check-circle"></i> Phòng sạch sẽ, tiện nghi hiện đại</li>
+                    <li><i class="fas fa-check-circle"></i> Giá cả cạnh tranh, minh bạch</li>
+                    <li><i class="fas fa-check-circle"></i> Dịch vụ chuyên nghiệp 24/7</li>
+                    <li><i class="fas fa-check-circle"></i> Vị trí thuận lợi, giao thông tiện lợi</li>
+                    <li><i class="fas fa-check-circle"></i> An ninh đảm bảo, camera giám sát</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ROOM LIST SECTION -->
+<section class="py-5" id="rooms">
+    <div class="container">
+        <div class="section-title">
+            <h2>Danh sách phòng</h2>
+            <p>Khám phá các loại phòng phù hợp với nhu cầu của bạn</p>
+        </div>
+
+        <div class="row">
+            @if (Model != null && Model.Any())
+            {
+                @foreach (var room in Model)
+                {
+                    var imagePath = room.RoomImages != null && room.RoomImages.Any()
+                    ? room.RoomImages.First().ImagePath
+                    : "/images/rooms/phongthuong.jpg";
+
+                    <div class="col-lg-4 col-md-6 mb-4">
+                        <div class="card room-card">
+                            <div style="overflow: hidden;">
+                                <img src="@Url.Content(imagePath)"
+                                     class="card-img-top room-img"
+                                     alt="@room.RoomNumber">
+                            </div>
+
+                            <div class="card-body">
+                                <h5>
+                                    <i class="fas fa-door-open me-2"></i>
+                                    @room.RoomNumber
+                                </h5>
+
+                                <p class="text-muted mb-2">
+                                    <i class="fas fa-tag me-1"></i>
+                                    @room.RoomType
+                                </p>
+
+                                <ul class="room-features">
+                                    <li><i class="fas fa-bed"></i> Giường đơn/đôi</li>
+                                    <li><i class="fas fa-wifi"></i> WiFi miễn phí</li>
+                                    <li><i class="fas fa-wind"></i> Điều hòa nhiệt độ</li>
+                                    <li><i class="fas fa-tv"></i> TV màn hình phẳng</li>
+                                </ul>
+
+                                <div class="price">
+                                    @room.OvernightPrice.ToString("N0") đ
+                                    <small class="d-block text-muted" style="font-size: 0.9rem;">/ đêm</small>
+                                </div>
+
+                                <a asp-controller="Home"
+                                   asp-action="Detail"
+                                   asp-route-id="@room.Id"
+                                   class="btn btn-view-detail w-100 mt-3">
+                                    <i class="fas fa-eye me-2"></i>Xem chi tiết
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                }
+            }
+            else
+            {
+                <div class="col-12 text-center">
+                    <p>Hiện chưa có phòng nào.</p>
+                </div>
+            }
+        </div>
+    </div>
+</section>
+
+<!-- SERVICES SECTION -->
+<section class="services-section" id="services">
+    <div class="container">
+        <div class="section-title">
+            <h2>Dịch vụ của chúng tôi</h2>
+            <p>Trải nghiệm các dịch vụ tiện ích tại Motel Lê Anh 49</p>
+        </div>
+
+        <div class="row">
+            <div class="col-lg-3 col-md-6 mb-4">
+                <div class="service-card">
+                    <div style="overflow: hidden;">
+                        <img src="https://images.unsplash.com/photo-1556912173-46c336c7fd55?w=600&h=400&fit=crop" alt="WiFi">
+                    </div>
+                    <div class="card-body">
+                        <div class="service-icon">
+                            <i class="fas fa-wifi"></i>
+                        </div>
+                        <h4>WiFi tốc độ cao</h4>
+                        <p>Kết nối Internet tốc độ cao miễn phí trong toàn bộ khu vực</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-3 col-md-6 mb-4">
+                <div class="service-card">
+                    <div style="overflow: hidden;">
+                        <img src="https://images.unsplash.com/photo-1590846406792-0adc7f938f1d?w=600&h=400&fit=crop" alt="Parking">
+                    </div>
+                    <div class="card-body">
+                        <div class="service-icon">
+                            <i class="fas fa-parking"></i>
+                        </div>
+                        <h4>Bãi đỗ xe</h4>
+                        <p>Bãi đỗ xe rộng rãi, an toàn với camera giám sát 24/7</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-3 col-md-6 mb-4">
+                <div class="service-card">
+                    <div style="overflow: hidden;">
+                        <img src="https://images.unsplash.com/photo-1559339352-11d035aa65de?w=600&h=400&fit=crop" alt="Laundry">
+                    </div>
+                    <div class="card-body">
+                        <div class="service-icon">
+                            <i class="fas fa-tshirt"></i>
+                        </div>
+                        <h4>Giặt ủi</h4>
+                        <p>Dịch vụ giặt ủi chuyên nghiệp, nhanh chóng và tiện lợi</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-3 col-md-6 mb-4">
+                <div class="service-card">
+                    <div style="overflow: hidden;">
+                        <img src="https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?w=600&h=400&fit=crop" alt="Room Service">
+                    </div>
+                    <div class="card-body">
+                        <div class="service-icon">
+                            <i class="fas fa-concierge-bell"></i>
+                        </div>
+                        <h4>Phục vụ phòng</h4>
+                        <p>Đội ngũ phục vụ tận tâm, sẵn sàng hỗ trợ 24/7</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- PROMOTION SECTION -->
+<section class="promotion-section" id="promotion">
+    <div class="container">
+        <div class="section-title">
+            <h2>Khuyến mãi đặc biệt</h2>
+            <p>Đừng bỏ lỡ các ưu đãi hấp dẫn từ chúng tôi</p>
+        </div>
+
+        <div class="row">
+            <div class="col-lg-4 col-md-6 mb-4">
+                <div class="promotion-card">
+                    <span class="promotion-badge">-20%</span>
+                    <img src="https://images.unsplash.com/photo-1445019980597-93fa8acb246c?w=600&h=400&fit=crop" alt="Promotion">
+                    <div class="card-body">
+                        <h5>Khuyến mãi mùa hè</h5>
+                        <p class="text-muted">
+                            <i class="far fa-calendar me-2"></i>
+                            Đến hết 30/06/2026
+                        </p>
+                        <p>Giảm 20% cho đặt phòng từ 3 đêm trở lên trong tháng 6</p>
+                        <a href="#booking" class="btn btn-gold w-100">
+                            <i class="fas fa-gift me-2"></i>Đặt ngay
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-4 col-md-6 mb-4">
+                <div class="promotion-card">
+                    <span class="promotion-badge">-15%</span>
+                    <img src="https://images.unsplash.com/photo-1542314831-068cd1dbfeeb?w=600&h=400&fit=crop" alt="Promotion">
+                    <div class="card-body">
+                        <h5>Ưu đãi khách hàng thân thiết</h5>
+                        <p class="text-muted">
+                            <i class="far fa-calendar me-2"></i>
+                            Cả năm
+                        </p>
+                        <p>Giảm 15% cho khách hàng đặt phòng lần 2 trở đi</p>
+                        <a href="#booking" class="btn btn-gold w-100">
+                            <i class="fas fa-gift me-2"></i>Đặt ngay
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-4 col-md-6 mb-4">
+                <div class="promotion-card">
+                    <span class="promotion-badge">Miễn phí</span>
+                    <img src="https://images.unsplash.com/photo-1540541338287-41700207dee6?w=600&h=400&fit=crop" alt="Promotion">
+                    <div class="card-body">
+                        <h5>Đưa đón sân bay</h5>
+                        <p class="text-muted">
+                            <i class="far fa-calendar me-2"></i>
+                            Theo yêu cầu
+                        </p>
+                        <p>Miễn phí đưa đón sân bay cho đặt phòng từ 5 đêm</p>
+                        <a href="#booking" class="btn btn-gold w-100">
+                            <i class="fas fa-gift me-2"></i>Đặt ngay
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Scroll Animation Script -->
+<script>
+    // Add fade-in animation when scrolling
+    const observerOptions = {
+        threshold: 0.1,
+        rootMargin: '0px 0px -50px 0px'
+    };
+
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                entry.target.style.animation = 'fadeInUp 0.8s ease forwards';
+            }
+        });
+    }, observerOptions);
+
+    document.querySelectorAll('.room-card, .service-card, .promotion-card').forEach(el => {
+        observer.observe(el);
+    });
+</script>

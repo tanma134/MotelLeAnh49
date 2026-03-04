@@ -1,0 +1,261 @@
+﻿@model MotelLeAnh49.Models.Room
+
+<style>
+    body {
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        background: #f5f7fa;
+        margin: 0;
+        padding: 20px;
+    }
+
+    .form-container {
+        max-width: 600px;
+        margin: 0 auto;
+        background: white;
+        padding: 40px;
+        border-radius: 12px;
+        box-shadow: 0 2px 15px rgba(0,0,0,0.1);
+    }
+
+    h2 {
+        color: #2c3e50;
+        margin-bottom: 30px;
+        font-size: 28px;
+        text-align: center;
+        border-bottom: 3px solid #f39c12;
+        padding-bottom: 10px;
+    }
+
+    .debug-error {
+        background: #ffe0e0;
+        padding: 15px;
+        margin-bottom: 20px;
+        border-left: 4px solid #e74c3c;
+        border-radius: 8px;
+    }
+
+        .debug-error b {
+            color: #c0392b;
+        }
+
+        .debug-error ul {
+            margin: 10px 0 0 0;
+            padding-left: 20px;
+        }
+
+    .debug-success {
+        background: #e0ffe0;
+        padding: 15px;
+        margin-bottom: 20px;
+        border-left: 4px solid #27ae60;
+        border-radius: 8px;
+        color: #27ae60;
+        font-weight: 600;
+    }
+
+    .validation-summary {
+        background: #fff3cd;
+        padding: 15px;
+        margin-bottom: 20px;
+        border-left: 4px solid #ffc107;
+        border-radius: 8px;
+        color: #856404;
+    }
+
+    .form-group {
+        margin-bottom: 20px;
+    }
+
+    label {
+        display: block;
+        margin-bottom: 8px;
+        color: #555;
+        font-weight: 600;
+        font-size: 14px;
+    }
+
+    input {
+        width: 100%;
+        padding: 12px 16px;
+        border: 2px solid #e0e0e0;
+        border-radius: 8px;
+        font-size: 15px;
+        transition: all 0.3s ease;
+        box-sizing: border-box;
+    }
+
+        input:focus {
+            outline: none;
+            border-color: #f39c12;
+            box-shadow: 0 0 0 3px rgba(243, 156, 18, 0.1);
+        }
+
+    .validation-error {
+        color: #e74c3c;
+        font-size: 13px;
+        margin-top: 5px;
+        display: block;
+    }
+
+    .button-group {
+        margin-top: 30px;
+        display: flex;
+        gap: 10px;
+    }
+
+    button {
+        flex: 1;
+        padding: 14px;
+        background: linear-gradient(135deg, #f39c12 0%, #e67e22 100%);
+        color: white;
+        border: none;
+        border-radius: 8px;
+        font-size: 16px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(243, 156, 18, 0.4);
+        }
+
+    .btn-back {
+        flex: 1;
+        padding: 14px;
+        background: #95a5a6;
+        color: white;
+        text-decoration: none;
+        border-radius: 8px;
+        font-size: 16px;
+        font-weight: 600;
+        text-align: center;
+        transition: all 0.3s ease;
+        display: inline-block;
+    }
+
+        .btn-back:hover {
+            background: #7f8c8d;
+            transform: translateY(-2px);
+        }
+</style>
+
+<div class="form-container">
+    <h2>✏️ Sửa thông tin phòng</h2>
+
+    @if (ViewBag.DebugErrors != null)
+    {
+        <div class="debug-error">
+            <b>🐛 DEBUG:</b>
+            <ul>
+                @foreach (string err in (List<string>)ViewBag.DebugErrors)
+                {
+                    <li>@err</li>
+                }
+            </ul>
+        </div>
+    }
+
+    @if (TempData["Debug"] != null)
+    {
+        <div class="debug-success">
+            ✅ @TempData["Debug"]
+        </div>
+    }
+
+    <form asp-controller="Rooms"
+          asp-action="Edit"
+          method="post"
+          enctype="multipart/form-data">
+
+        @Html.AntiForgeryToken()
+
+        <input type="hidden" asp-for="Id" />
+        <input type="hidden" asp-for="AdminId" />
+
+        <div asp-validation-summary="All" class="validation-summary"></div>
+
+        <div class="form-group">
+            <label>Số phòng</label>
+            <input asp-for="RoomNumber" />
+            <span asp-validation-for="RoomNumber" class="validation-error"></span>
+        </div>
+
+        <div class="form-group">
+            <label>Loại phòng</label>
+            <input asp-for="RoomType" />
+            <span asp-validation-for="RoomType" class="validation-error"></span>
+        </div>
+
+        <div class="form-group">
+            <label>Giá qua đêm (VNĐ)</label>
+            <input asp-for="OvernightPrice" type="number" />
+        </div>
+
+        <div class="form-group">
+            <label>Giá ngày (VNĐ)</label>
+            <input asp-for="DayPrice" type="number" />
+        </div>
+
+        <div class="form-group">
+            <label>Giá giờ đầu (VNĐ)</label>
+            <input asp-for="FirstHourPrice" type="number" />
+        </div>
+
+        <div class="form-group">
+            <label>Giá giờ tiếp theo (VNĐ)</label>
+            <input asp-for="NextHourPrice" type="number" />
+        </div>
+
+        <div class="form-group">
+            <label>Số khách tối đa</label>
+            <input asp-for="MaxGuests" type="number" />
+        </div>
+
+        <div class="form-group">
+            <label>Phụ thu thêm người (VNĐ)</label>
+            <input asp-for="ExtraGuestFee" type="number" />
+        </div>
+
+        <!-- ================= ẢNH HIỆN TẠI ================= -->
+
+        <h4>📸 Ảnh hiện tại</h4>
+
+        @if (Model.RoomImages != null && Model.RoomImages.Any())
+        {
+            foreach (var img in Model.RoomImages)
+            {
+                <div style="margin-bottom:15px;">
+                    <img src="@img.ImagePath" width="150" />
+
+                    <label style="display:block;">
+                        <input type="checkbox"
+                               name="DeletedImageIds"
+                               value="@img.Id" />
+                        ❌ Xóa ảnh này
+                    </label>
+                </div>
+            }
+        }
+        else
+        {
+            <p>Chưa có ảnh.</p>
+        }
+
+        <!-- ================= THÊM ẢNH MỚI ================= -->
+
+        <div class="form-group">
+            <label>➕ Thêm ảnh mới</label>
+            <input type="file"
+                   name="Images"
+                   multiple
+                   accept="image/*" />
+        </div>
+
+        <div class="button-group">
+            <button type="submit">✅ Cập nhật</button>
+            <a asp-controller="Rooms" asp-action="Index" class="btn-back">⬅ Quay lại</a>
+        </div>
+    </form>
+</div>
