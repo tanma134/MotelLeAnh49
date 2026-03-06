@@ -26,6 +26,9 @@ namespace DataAccess.Models
         [MaxLength(200)]
         public string Address { get; set; }
 
+        [MaxLength(200)]
+        public string Email { get; set; }
+
         [MaxLength(50)]
         public string IdentityNumber { get; set; }
 
