@@ -73,6 +73,63 @@
                         </a>
                     </li>
 
+                    <!-- LOGIN AREA -->
+                    @if (Context.Session.GetString("FullName") == null)
+                    {
+                        <li class="nav-item">
+                            <a class="nav-link btn btn-success text-white ms-2 px-3"
+                               asp-controller="Auth"
+                               asp-action="Login">
+                                <i class="fas fa-user"></i> Đăng nhập
+                            </a>
+                        </li>
+                    }
+                    else
+                    {
+                        <li class="nav-item dropdown ms-3">
+                            <a class="nav-link dropdown-toggle text-warning"
+                               href="#"
+                               data-bs-toggle="dropdown">
+
+                                <i class="fas fa-user-circle"></i>
+                                Xin chào, @Context.Session.GetString("FullName")
+
+                            </a>
+
+                            <ul class="dropdown-menu dropdown-menu-end">
+
+                                <li>
+                                    <a class="dropdown-item"
+                                       asp-controller="Customer"
+                                       asp-action="Profile">
+                                        Hồ sơ
+                                    </a>
+                                </li>
+
+                                <li>
+                                    <a class="dropdown-item"
+                                       asp-controller="Booking"
+                                       asp-action="History">
+                                        Lịch sử đặt phòng
+                                    </a>
+                                </li>
+
+                                <li>
+                                    <hr class="dropdown-divider">
+                                </li>
+
+                                <li>
+                                    <a class="dropdown-item text-danger"
+                                       asp-controller="Auth"
+                                       asp-action="Logout">
+                                        Đăng xuất
+                                    </a>
+                                </li>
+
+                            </ul>
+                        </li>
+                    }
+
                 </ul>
             </div>
         </div>

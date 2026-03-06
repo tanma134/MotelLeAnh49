@@ -4,6 +4,8 @@ using DataAccess.Repositories;
 using DataAccess.Repositories.Interfaces;
 using BusinessLogic.Services;
 using BusinessLogic.Interfaces;
+using BusinessLogic.Service;
+using BusinessLogic.Config;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -18,10 +20,15 @@ builder.Services.AddDbContext<MotelDbContext>(options =>
 // 👉 Repository
 builder.Services.AddScoped<IRoomRepository, RoomRepository>();
 builder.Services.AddScoped<IAdminRepository, AdminRepository>();
+builder.Services.AddScoped<IAccountRepository, AccountRepository>();
 
 // 👉 Service
 builder.Services.AddScoped<IRoomService, RoomService>();
 builder.Services.AddScoped<IAdminService, AdminService>();
+builder.Services.AddScoped<EmailService>();
+builder.Services.AddScoped<AuthService>();
+builder.Services.Configure<EmailSettings>(
+    builder.Configuration.GetSection("EmailSettings"));
 
 // MVC
 builder.Services.AddControllersWithViews();
