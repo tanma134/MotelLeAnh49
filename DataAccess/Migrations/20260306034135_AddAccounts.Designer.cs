@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using MotelLeAnh49.Data;
 
@@ -11,9 +12,11 @@ using MotelLeAnh49.Data;
 namespace MotelLeAnh49.Migrations
 {
     [DbContext(typeof(MotelDbContext))]
-    partial class MotelDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260306034135_AddAccounts")]
+    partial class AddAccounts
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

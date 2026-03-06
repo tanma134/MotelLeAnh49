@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using DataAccess.Models;
+using Microsoft.EntityFrameworkCore;
 using MotelLeAnh49.Models;
 
 namespace MotelLeAnh49.Data
@@ -14,6 +15,9 @@ namespace MotelLeAnh49.Data
         public DbSet<Room> Rooms { get; set; }
         public DbSet<RoomImage> RoomImages { get; set; }
         public DbSet<Booking> Bookings { get; set; }
+        public DbSet<Account> Accounts { get; set; }
+
+        public DbSet<Customer> Customers { get; set; }
 
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
