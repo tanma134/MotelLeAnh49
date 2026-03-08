@@ -18,6 +18,8 @@ namespace DataAccess.Repositories
         void Update(Account account);
 
         void Save();
+
+        Account GetById(int id);
     }
 }
 

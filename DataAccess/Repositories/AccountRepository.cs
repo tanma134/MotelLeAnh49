@@ -45,5 +45,11 @@ namespace DataAccess.Repositories
         {
             _context.SaveChanges();
         }
+
+        public Account GetById(int id)
+        {
+            // Tìm tài khoản theo Id, trả về null nếu không thấy
+            return _context.Accounts.FirstOrDefault(a => a.Id == id);
+        }
     }
 }

@@ -5,6 +5,7 @@ using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore;
 
 namespace DataAccess.Models
 {
@@ -34,5 +35,7 @@ namespace DataAccess.Models
 
         // Navigation
         public Account Account { get; set; }
+
+        
     }
 }
