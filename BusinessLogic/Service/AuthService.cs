@@ -63,7 +63,7 @@ namespace BusinessLogic.Service
             return rand.Next(100000, 999999).ToString();
         }
 
-        private string HashPassword(string password)
+        public string HashPassword(string password)
         {
             using SHA256 sha = SHA256.Create();
             var bytes = Encoding.UTF8.GetBytes(password);

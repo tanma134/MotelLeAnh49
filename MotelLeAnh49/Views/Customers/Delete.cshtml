@@ -1,0 +1,140 @@
+﻿@model DataAccess.Models.Customer
+
+<style>
+    body {
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        background: #f5f7fa;
+        margin: 0;
+        padding: 20px;
+    }
+
+    .delete-container {
+        max-width: 550px;
+        margin: 80px auto;
+        background: white;
+        padding: 40px;
+        border-radius: 12px;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+        text-align: center;
+    }
+
+    h2 {
+        color: #e74c3c;
+        margin-bottom: 20px;
+        font-size: 28px;
+        font-weight: bold;
+    }
+
+    .warning-icon {
+        font-size: 70px;
+        color: #e74c3c;
+        margin-bottom: 20px;
+        animation: pulse 2s infinite;
+    }
+
+    @@keyframes pulse {
+        0% {
+            transform: scale(1);
+        }
+
+        50% {
+            transform: scale(1.1);
+        }
+
+        100% {
+            transform: scale(1);
+        }
+    }
+
+    .info-box {
+        background: #fff5f5;
+        border: 1px dashed #e74c3c;
+        padding: 20px;
+        border-radius: 8px;
+        margin-bottom: 30px;
+    }
+
+    p {
+        color: #555;
+        font-size: 16px;
+        line-height: 1.6;
+    }
+
+        p b {
+            color: #c0392b;
+            font-size: 20px;
+        }
+
+    .button-group {
+        display: flex;
+        gap: 15px;
+        justify-content: center;
+    }
+
+    button {
+        padding: 14px 30px;
+        background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);
+        color: white;
+        border: none;
+        border-radius: 8px;
+        font-size: 16px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(231, 76, 60, 0.4);
+        }
+
+    .btn-cancel {
+        padding: 14px 30px;
+        background: #95a5a6;
+        color: white;
+        text-decoration: none;
+        border-radius: 8px;
+        font-size: 16px;
+        font-weight: 600;
+        transition: all 0.3s ease;
+        display: inline-block;
+    }
+
+        .btn-cancel:hover {
+            background: #7f8c8d;
+            transform: translateY(-2px);
+        }
+</style>
+
+<div class="delete-container">
+    <div class="warning-icon">🚫</div>
+    <h2>Xác nhận khóa khách hàng</h2>
+
+    <div class="info-box">
+        <p>
+            Bạn có chắc chắn muốn ngừng cung cấp dịch vụ cho khách hàng:<br />
+            <b>@Model.FullName</b>
+        </p>
+        <p style="font-size: 14px; color: #7f8c8d;">
+            (Số định danh: @Model.IdentityNumber)
+        </p>
+    </div>
+
+    <p>
+        Hành động này sẽ <strong>khóa tài khoản đăng nhập</strong> của khách hàng.<br />
+        Dữ liệu lịch sử hóa đơn vẫn sẽ được giữ lại.
+    </p>
+
+    <form asp-action="Delete" method="post">
+        @* Quan trọng: Gửi Id khách hàng về để Controller biết đường mà xóa *@
+        <input type="hidden" asp-for="Id" />
+
+        <div class="button-group">
+            <button type="submit">🔒 Khóa tài khoản</button>
+            <a asp-action="Index" class="btn-cancel">❌ Huỷ bỏ</a>
+        </div>
+    </form>
+</div>

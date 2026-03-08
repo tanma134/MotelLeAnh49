@@ -30,6 +30,9 @@ builder.Services.AddScoped<AuthService>();
 builder.Services.Configure<EmailSettings>(
     builder.Configuration.GetSection("EmailSettings"));
 
+builder.Services.AddScoped<ICustomerRepository, CustomerRepository>();
+builder.Services.AddScoped<ICustomerService, CustomerService>();
+
 // MVC
 builder.Services.AddControllersWithViews();
 
