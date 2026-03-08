@@ -2,56 +2,266 @@
     ViewData["Title"] = "Verify OTP";
 }
 
-<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;600&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
 
 <style>
+    :root {
+        --bg: #0d0d0f;
+        --surface: #131317;
+        --border: rgba(255,255,255,0.07);
+        --gold: #c9a96e;
+        --gold-light: #e8c98a;
+        --text: #e8e4dc;
+        --muted: #6b6763;
+        --input-bg: #1a1a20;
+        --danger: #e07070;
+    }
 
-    .auth-wrapper {
+    * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+    }
+
+    .verify-page {
         min-height: 70vh;
         display: flex;
         justify-content: center;
         align-items: center;
+        background: var(--bg);
+        font-family: 'DM Sans', sans-serif;
+        position: relative;
+        overflow: hidden;
+        padding: 40px 16px;
     }
 
-    .auth-card {
+        .verify-page::before,
+        .verify-page::after {
+            content: '';
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(90px);
+            pointer-events: none;
+        }
+
+        .verify-page::before {
+            width: 400px;
+            height: 400px;
+            background: radial-gradient(circle, rgba(201,169,110,0.08) 0%, transparent 70%);
+            top: -100px;
+            left: -100px;
+        }
+
+        .verify-page::after {
+            width: 350px;
+            height: 350px;
+            background: radial-gradient(circle, rgba(120,100,180,0.06) 0%, transparent 70%);
+            bottom: -80px;
+            right: -80px;
+        }
+
+    .verify-card {
         width: 420px;
-        border-radius: 15px;
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: 4px;
+        padding: 52px 44px 44px;
+        position: relative;
+        text-align: center;
+        animation: slideUp 0.7s cubic-bezier(0.16, 1, 0.3, 1) both;
+        box-shadow: 0 0 0 1px rgba(201,169,110,0.05), 0 32px 64px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.04);
     }
 
-    body {
-        background: linear-gradient(135deg,#667eea,#764ba2);
+        .verify-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 44px;
+            right: 44px;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, var(--gold), transparent);
+        }
+
+    @@keyframes slideUp {
+        from {
+            opacity: 0;
+            transform: translateY(28px);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
     }
 
+    .verify-icon {
+        width: 56px;
+        height: 56px;
+        margin: 0 auto 24px;
+        border: 1px solid rgba(201,169,110,0.25);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: rgba(201,169,110,0.06);
+    }
+
+        .verify-icon svg {
+            width: 22px;
+            height: 22px;
+            stroke: var(--gold);
+            fill: none;
+            stroke-width: 1.5;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+        }
+
+    .verify-eyebrow {
+        font-size: 10px;
+        letter-spacing: 0.3em;
+        text-transform: uppercase;
+        color: var(--gold);
+        font-weight: 400;
+        margin-bottom: 10px;
+    }
+
+    .verify-title {
+        font-family: 'Cormorant Garamond', serif;
+        font-size: 36px;
+        font-weight: 300;
+        color: var(--text);
+        line-height: 1;
+        letter-spacing: -0.01em;
+        margin-bottom: 10px;
+    }
+
+    .verify-subtitle {
+        font-size: 13px;
+        color: var(--muted);
+        font-weight: 300;
+        line-height: 1.6;
+        margin-bottom: 36px;
+    }
+
+    /* OTP input */
+    .field {
+        margin-bottom: 16px;
+    }
+
+        .field input {
+            width: 100%;
+            background: var(--input-bg);
+            border: 1px solid var(--border);
+            border-radius: 3px;
+            color: var(--text);
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 28px;
+            font-weight: 400;
+            letter-spacing: 0.35em;
+            text-align: center;
+            padding: 16px;
+            outline: none;
+            transition: border-color 0.25s, box-shadow 0.25s;
+            -webkit-appearance: none;
+        }
+
+            .field input::placeholder {
+                color: rgba(255,255,255,0.12);
+                font-size: 15px;
+                letter-spacing: 0.1em;
+                font-family: 'DM Sans', sans-serif;
+            }
+
+            .field input:focus {
+                border-color: rgba(201,169,110,0.4);
+                box-shadow: 0 0 0 3px rgba(201,169,110,0.06);
+            }
+
+    .btn-verify {
+        width: 100%;
+        padding: 14px;
+        background: linear-gradient(135deg, #b8934a, var(--gold-light), #b8934a);
+        background-size: 200% 100%;
+        background-position: right center;
+        border: none;
+        border-radius: 3px;
+        color: #1a120a;
+        font-family: 'DM Sans', sans-serif;
+        font-size: 12px;
+        font-weight: 500;
+        letter-spacing: 0.15em;
+        text-transform: uppercase;
+        cursor: pointer;
+        transition: background-position 0.4s ease, box-shadow 0.3s;
+        box-shadow: 0 4px 20px rgba(201,169,110,0.2);
+    }
+
+        .btn-verify:hover {
+            background-position: left center;
+            box-shadow: 0 6px 28px rgba(201,169,110,0.35);
+        }
+
+        .btn-verify:active {
+            transform: translateY(1px);
+        }
+
+    .msg-error {
+        font-size: 13px;
+        color: var(--danger);
+        text-align: center;
+        margin-top: 16px;
+        font-weight: 300;
+        min-height: 20px;
+    }
+
+    .footer-note {
+        text-align: center;
+        margin-top: 28px;
+        font-size: 13px;
+        color: var(--muted);
+        font-weight: 300;
+    }
+
+        .footer-note a {
+            color: var(--gold);
+            text-decoration: none;
+            font-weight: 400;
+            transition: color 0.2s;
+        }
+
+            .footer-note a:hover {
+                color: var(--gold-light);
+            }
 </style>
 
-<div class="container auth-wrapper">
+<div class="verify-page">
+    <div class="verify-card">
 
-    <div class="card auth-card shadow-lg p-4 text-center">
+        <div class="verify-icon">
+            <svg viewBox="0 0 24 24">
+                <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+            </svg>
+        </div>
 
-        <h3 class="mb-3">
-            <i class="fa-solid fa-shield-halved"></i>
-            Verify OTP
-        </h3>
-
-        <p class="text-muted mb-4">
-            Enter the OTP sent to your email
-        </p>
+        <p class="verify-eyebrow">Security check</p>
+        <h1 class="verify-title">Verify OTP</h1>
+        <p class="verify-subtitle">Enter the one-time code sent<br>to your email address.</p>
 
         <form method="post">
+            <div class="field">
+                <input name="otp" type="text" placeholder="Enter OTP"
+                       maxlength="6" inputmode="numeric"
+                       autocomplete="one-time-code" required />
+            </div>
 
-            <input name="otp"
-                   class="form-control text-center mb-3"
-                   placeholder="Enter OTP"
-                   required>
+            <button type="submit" class="btn-verify">Verify Code</button>
 
-            <button class="btn btn-success w-100">
-                Verify OTP
-            </button>
-
-            <p class="text-danger mt-3">@ViewBag.Error</p>
-
+            <p class="msg-error">@ViewBag.Error</p>
         </form>
 
-    </div>
+        <p class="footer-note">
+            Back to <a href="/Auth/Login">Sign in</a>
+        </p>
 
+    </div>
 </div>
