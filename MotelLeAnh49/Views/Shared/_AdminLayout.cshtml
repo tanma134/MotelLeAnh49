@@ -60,11 +60,11 @@
             <i class="fas fa-chart-line"></i> Dashboard
         </a>
 
-        <a asp-controller="AdminCustomer" asp-action="Index">
+        <a asp-controller="Customers" asp-action="Index">
             <i class="fas fa-users"></i> Manage Customer
         </a>
 
-        <a asp-controller="AdminRoom" asp-action="Index">
+        <a asp-controller="Rooms" asp-action="Index">
             <i class="fas fa-bed"></i> Manage Room
         </a>
 
@@ -89,6 +89,6 @@
     </div>
 
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
-
+    @RenderSection("Scripts", required: false)
 </body>
 </html>

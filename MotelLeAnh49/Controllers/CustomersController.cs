@@ -1,6 +1,8 @@
 ﻿using BusinessLogic.Service;
 using DataAccess.Models;
+
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.EntityFrameworkCore;
 
 namespace MotelLeAnh49.Controllers
@@ -14,6 +16,18 @@ namespace MotelLeAnh49.Controllers
         {
             _customerService = customerService;
             _authService = authService;
+        }
+
+        public override void OnActionExecuting(ActionExecutingContext context)
+        {
+            var role = HttpContext.Session.GetString("Role");
+
+            if (role != "Admin")
+            {
+                context.Result = RedirectToAction("Login", "Admin");
+            }
+
+            base.OnActionExecuting(context);
         }
 
         public IActionResult Index()
