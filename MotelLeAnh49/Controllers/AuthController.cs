@@ -37,6 +37,9 @@ namespace MotelLeAnh49.Controllers
             HttpContext.Session.SetString("Username", account.Username);
             HttpContext.Session.SetString("Role", account.Role);
             HttpContext.Session.SetString("FullName", account.Customer.FullName);
+            HttpContext.Session.SetString("Email", account.Email);
+
+            HttpContext.Session.SetInt32("CustomerId", account.Customer.Id);
 
             return RedirectToAction("Index", "Home");
         }

@@ -8,7 +8,7 @@ using MotelLeAnh49.Data;
 
 #nullable disable
 
-namespace MotelLeAnh49.Migrations
+namespace DataAccess.Migrations
 {
     [DbContext(typeof(MotelDbContext))]
     partial class MotelDbContextModelSnapshot : ModelSnapshot
@@ -166,10 +166,38 @@ namespace MotelLeAnh49.Migrations
                     b.Property<int>("Children")
                         .HasColumnType("int");
 
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int?>("CustomerId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Email")
+                        .IsRequired()
+                        .HasMaxLength(150)
+                        .HasColumnType("nvarchar(150)");
+
+                    b.Property<string>("FullName")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<string>("Phone")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
+
                     b.Property<int>("RoomId")
                         .HasColumnType("int");
 
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
                     b.HasKey("Id");
+
+                    b.HasIndex("CustomerId");
 
                     b.HasIndex("RoomId");
 
@@ -257,11 +285,17 @@ namespace MotelLeAnh49.Migrations
 
             modelBuilder.Entity("MotelLeAnh49.Models.Booking", b =>
                 {
+                    b.HasOne("DataAccess.Models.Customer", "Customer")
+                        .WithMany("Bookings")
+                        .HasForeignKey("CustomerId");
+
                     b.HasOne("MotelLeAnh49.Models.Room", "Room")
                         .WithMany()
                         .HasForeignKey("RoomId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.Navigation("Customer");
 
                     b.Navigation("Room");
                 });
@@ -292,6 +326,11 @@ namespace MotelLeAnh49.Migrations
                 {
                     b.Navigation("Customer")
                         .IsRequired();
+                });
+
+            modelBuilder.Entity("DataAccess.Models.Customer", b =>
+                {
+                    b.Navigation("Bookings");
                 });
 
             modelBuilder.Entity("MotelLeAnh49.Models.Admin", b =>

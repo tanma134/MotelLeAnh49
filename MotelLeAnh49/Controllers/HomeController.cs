@@ -42,6 +42,12 @@ namespace MotelLeAnh49.Controllers
             if (room == null)
                 return NotFound();
 
+            // Lấy CustomerId từ Session
+            var customerId = HttpContext.Session.GetInt32("CustomerId");
+
+            // truyền sang View
+            ViewBag.CustomerId = customerId;
+
             return View(room);
         }
 

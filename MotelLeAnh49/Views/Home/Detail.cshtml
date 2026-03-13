@@ -17,7 +17,7 @@
         height: 500px;
         object-fit: cover;
         border-radius: 10px;
-        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+        box-shadow: 0 10px 30px rgba(0,0,0,0.2);
     }
 
     .thumbnail-gallery {
@@ -47,7 +47,7 @@
         background: white;
         padding: 30px;
         border-radius: 10px;
-        box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+        box-shadow: 0 5px 20px rgba(0,0,0,0.1);
     }
 
     .room-title {
@@ -65,7 +65,7 @@
     }
 
     .price-box {
-        background: linear-gradient(135deg, var(--primary-color) 0%, #c09d2e 100%);
+        background: linear-gradient(135deg,var(--primary-color) 0%,#c09d2e 100%);
         padding: 25px;
         border-radius: 10px;
         color: white;
@@ -79,10 +79,6 @@
             margin: 10px 0;
         }
 
-        .price-box small {
-            font-size: 1rem;
-        }
-
     .features-list {
         list-style: none;
         padding: 0;
@@ -94,10 +90,6 @@
             display: flex;
             align-items: center;
         }
-
-            .features-list li:last-child {
-                border-bottom: none;
-            }
 
         .features-list i {
             color: var(--primary-color);
@@ -115,15 +107,8 @@
         background: white;
         padding: 30px;
         border-radius: 10px;
-        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+        box-shadow: 0 10px 30px rgba(0,0,0,0.15);
     }
-
-        .booking-card h4 {
-            color: var(--secondary-color);
-            font-weight: 700;
-            margin-bottom: 25px;
-            text-align: center;
-        }
 
     .related-rooms {
         background: #f8f9fa;
@@ -135,22 +120,24 @@
 <div class="room-detail-section">
     <div class="container">
         <div class="row">
-            <!-- Left Column - Room Gallery & Info -->
+
+            <!-- LEFT -->
             <div class="col-lg-8">
-                <!-- Breadcrumb -->
+
                 <nav aria-label="breadcrumb" class="mb-4">
                     <ol class="breadcrumb">
-                        <li class="breadcrumb-item"><a asp-controller="Home" asp-action="Index">Trang chủ</a></li>
+                        <li class="breadcrumb-item">
+                            <a asp-controller="Home" asp-action="Index">Trang chủ</a>
+                        </li>
                         <li class="breadcrumb-item active">Chi tiết phòng</li>
                     </ol>
                 </nav>
 
-                <!-- Room Gallery -->
                 <div class="room-gallery">
+
                     <img id="mainImage"
-                         src="@(Model?.RoomImages?.FirstOrDefault()?.ImagePath ?? "https://images.unsplash.com/photo-1611892440504-42a792e24d32?w=1200&h=800&fit=crop")"
-                         alt="@Model?.RoomNumber"
-                         class="main-image">
+                         src="@(Model?.RoomImages?.FirstOrDefault()?.ImagePath ?? "https://images.unsplash.com/photo-1611892440504-42a792e24d32?w=1200")"
+                         class="main-image" />
 
                     @if (Model?.RoomImages != null && Model.RoomImages.Any())
                     {
@@ -158,101 +145,59 @@
                             @foreach (var image in Model.RoomImages)
                             {
                                 <img src="@image.ImagePath"
-                                     alt="Room Image"
                                      class="thumbnail"
-                                     onclick="changeMainImage(this.src)">
+                                     onclick="changeMainImage(this.src)" />
                             }
-                        </div>
-                    }
-                    else
-                    {
-                        <div class="thumbnail-gallery">
-                            <img src="https://images.unsplash.com/photo-1611892440504-42a792e24d32?w=400&h=300&fit=crop" class="thumbnail active" onclick="changeMainImage(this.src)">
-                            <img src="https://images.unsplash.com/photo-1590490360182-c33d57733427?w=400&h=300&fit=crop" class="thumbnail" onclick="changeMainImage(this.src)">
-                            <img src="https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?w=400&h=300&fit=crop" class="thumbnail" onclick="changeMainImage(this.src)">
-                            <img src="https://images.unsplash.com/photo-1566665797739-1674de7a421a?w=400&h=300&fit=crop" class="thumbnail" onclick="changeMainImage(this.src)">
                         </div>
                     }
                 </div>
 
-                <!-- Room Information -->
                 <div class="room-info">
+
                     <h1 class="room-title">
                         <i class="fas fa-door-open me-2"></i>
                         Phòng @Model?.RoomNumber
                     </h1>
+
                     <p class="room-type">
                         <i class="fas fa-tag me-2"></i>
                         @Model?.RoomType
                     </p>
 
                     <div class="price-box">
-                        <p class="mb-2"><i class="fas fa-moon me-2"></i>Giá thuê qua đêm</p>
-                        <div class="price">@(Model?.OvernightPrice.ToString("N0") ?? "500,000") đ</div>
+                        <p><i class="fas fa-moon me-2"></i>Giá thuê qua đêm</p>
+                        <div class="price">
+                            @(Model?.OvernightPrice.ToString("N0")) đ
+                        </div>
                         <small>/ đêm</small>
                     </div>
 
-                    <h4 class="mt-4 mb-3" style="color: var(--secondary-color); font-weight: 600;">
+                    <h4 class="mt-4 mb-3">
                         <i class="fas fa-list me-2"></i>Tiện nghi phòng
                     </h4>
+
                     <ul class="features-list">
-                        <li>
-                            <i class="fas fa-bed"></i>
-                            <span><strong>Giường:</strong> Giường đơn/đôi cao cấp với nệm êm ái</span>
-                        </li>
-                        <li>
-                            <i class="fas fa-wifi"></i>
-                            <span><strong>WiFi:</strong> Internet tốc độ cao miễn phí</span>
-                        </li>
-                        <li>
-                            <i class="fas fa-wind"></i>
-                            <span><strong>Điều hòa:</strong> Hệ thống điều hòa nhiệt độ hiện đại</span>
-                        </li>
-                        <li>
-                            <i class="fas fa-tv"></i>
-                            <span><strong>Giải trí:</strong> Smart TV màn hình phẳng 43"</span>
-                        </li>
-                        <li>
-                            <i class="fas fa-shower"></i>
-                            <span><strong>Phòng tắm:</strong> Vòi sen nóng lạnh, đầy đủ tiện nghi</span>
-                        </li>
-                        <li>
-                            <i class="fas fa-door-closed"></i>
-                            <span><strong>An ninh:</strong> Khóa cửa thông minh, camera giám sát</span>
-                        </li>
-                        <li>
-                            <i class="fas fa-broom"></i>
-                            <span><strong>Vệ sinh:</strong> Dọn dẹp phòng hàng ngày</span>
-                        </li>
-                        <li>
-                            <i class="fas fa-coffee"></i>
-                            <span><strong>Tiện ích:</strong> Ấm đun nước, ly cốc, tủ lạnh mini</span>
-                        </li>
+                        <li><i class="fas fa-bed"></i>Giường cao cấp</li>
+                        <li><i class="fas fa-wifi"></i>WiFi miễn phí</li>
+                        <li><i class="fas fa-wind"></i>Điều hòa</li>
+                        <li><i class="fas fa-tv"></i>Smart TV</li>
+                        <li><i class="fas fa-shower"></i>Phòng tắm nóng lạnh</li>
                     </ul>
 
-                    <div class="mt-4 p-3" style="background: #f8f9fa; border-radius: 8px;">
-                        <h5 style="color: var(--secondary-color);">
-                            <i class="fas fa-info-circle me-2"></i>Chính sách phòng
-                        </h5>
-                        <ul class="mb-0" style="color: #666;">
-                            <li>Nhận phòng: Từ 14:00</li>
-                            <li>Trả phòng: Trước 12:00</li>
-                            <li>Không hút thuốc trong phòng</li>
-                            <li>Không nuôi thú cưng</li>
-                            <li>Thanh toán: Tiền mặt hoặc chuyển khoản</li>
-                        </ul>
-                    </div>
                 </div>
             </div>
 
-            <!-- Right Column - Booking Sidebar -->
+            <!-- RIGHT -->
             <div class="col-lg-4">
+
                 <div class="booking-sidebar">
                     <div class="booking-card">
+
                         <h4>
                             <i class="fas fa-calendar-check me-2"></i>
                             Đặt phòng ngay
                         </h4>
+
                         @if (TempData["Success"] != null)
                         {
                             <div class="alert alert-success">
@@ -266,162 +211,41 @@
                                 @TempData["Error"]
                             </div>
                         }
-                        <form asp-controller="Rooms" asp-action="Book" method="post">
 
-                            <input type="hidden" name="roomId" value="@Model.Id" />
-
-                            <div class="mb-3">
-                                <label class="form-label fw-semibold">
-                                    <i class="far fa-calendar me-2"></i>Ngày nhận phòng
-                                </label>
-                                <input type="date"
-                                       name="checkIn"
-                                       class="form-control"
-                                       required
-                                       min="@DateTime.Today.ToString("yyyy-MM-dd")"
-                                       value="@(ViewBag.CheckIn != null ? ((DateTime)ViewBag.CheckIn).ToString("yyyy-MM-dd") : "")">
-                            </div>
-
-                            <div class="mb-3">
-                                <label class="form-label fw-semibold">
-                                    <i class="far fa-calendar me-2"></i>Ngày trả phòng
-                                </label>
-                                <input type="date"
-                                       name="checkOut"
-                                       class="form-control"
-                                       required
-                                       min="@DateTime.Today.ToString("yyyy-MM-dd")"
-                                       value="@(ViewBag.CheckOut != null ? ((DateTime)ViewBag.CheckOut).ToString("yyyy-MM-dd") : "")">
-                            </div>
-
-                            <div class="mb-3">
-                                <label class="form-label fw-semibold">
-                                    <i class="fas fa-user me-2"></i>Số người
-                                </label>
-                                <select name="adults" class="form-select">
-                                    <option value="1">1 người</option>
-                                    <option value="2" selected>2 người</option>
-                                    <option value="3">3 người</option>
-                                    <option value="4">4 người</option>
-                                </select>
-                            </div>
-
-                            @if (ViewBag.IsAvailable == false)
-                            {
-                                <button type="submit" class="btn btn-secondary w-100 mb-3" disabled>
-                                    Phòng đã được đặt
-                                </button>
-                            }
-                            else
-                            {
-                                <button type="submit" class="btn btn-gold w-100 mb-3">
-                                    <i class="fas fa-check-circle me-2"></i>Đặt phòng ngay
-                                </button>
-                            }
-
-                            <a href="tel:0909999999" class="btn btn-outline-dark w-100">
-                                <i class="fas fa-phone me-2"></i>Gọi: 0909 999 999
+                        @if (ViewBag.CustomerId == null)
+                        {
+                            <a asp-controller="Auth"
+                               asp-action="Login"
+                               class="btn btn-gold w-100 mb-3">
+                                Đăng nhập để đặt phòng
                             </a>
-                        </form>
-
-                        <div class="mt-4 text-center">
-                            <p class="mb-2" style="color: #666;">
-                                <i class="fas fa-shield-alt me-2"></i>
-                                Đặt phòng an toàn & bảo mật
-                            </p>
-                            <p class="mb-0" style="color: #666; font-size: 0.9rem;">
-                                <i class="fas fa-check-circle me-2" style="color: green;"></i>
-                                Hủy miễn phí trong 24h
-                            </p>
-                        </div>
-                    </div>
-
-                    <!-- Contact Card -->
-                    <div class="booking-card mt-4">
-                        <h4>
-                            <i class="fas fa-headset me-2"></i>
-                            Cần hỗ trợ?
-                        </h4>
-                        <p class="text-center mb-3" style="color: #666;">
-                            Đội ngũ của chúng tôi luôn sẵn sàng hỗ trợ bạn 24/7
-                        </p>
-                        <div class="d-grid gap-2">
-                            <a href="tel:0909999999" class="btn btn-outline-primary">
-                                <i class="fas fa-phone me-2"></i>Hotline: 0909 999 999
+                        }
+                        else
+                        {
+                            <a asp-controller="Bookings"
+                               asp-action="BookRoom"
+                               asp-route-roomId="@Model.Id"
+                               class="btn btn-gold w-100 mb-3">
+                                <i class="fas fa-check-circle me-2"></i>Đặt phòng ngay
                             </a>
-                            <a href="mailto:info@motelleanh49.com" class="btn btn-outline-success">
-                                <i class="fas fa-envelope me-2"></i>Email tư vấn
-                            </a>
-                        </div>
+                        }
+
+                        <a href="tel:0909999999"
+                           class="btn btn-outline-dark w-100">
+                            <i class="fas fa-phone me-2"></i>
+                            Gọi: 0909 999 999
+                        </a>
+
                     </div>
                 </div>
+
             </div>
         </div>
     </div>
 </div>
 
-<!-- Related Rooms Section -->
-<section class="related-rooms">
-    <div class="container">
-        <div class="section-title">
-            <h2>Các phòng tương tự</h2>
-            <p>Khám phá thêm các lựa chọn khác</p>
-        </div>
-
-        <div class="row">
-            @for (int i = 0; i < 3; i++)
-            {
-                <div class="col-lg-4 col-md-6 mb-4">
-                    <div class="card room-card">
-                        <div style="overflow: hidden;">
-                            <img src="https://images.unsplash.com/photo-@(new[] { "1611892440504-42a792e24d32", "1590490360182-c33d57733427", "1582719478250-c89cae4dc85b" }[i])?w=800&h=600&fit=crop"
-                                 class="card-img-top room-img" alt="Room">
-                        </div>
-                        <div class="card-body">
-                            <h5>
-                                <i class="fas fa-door-open me-2"></i>
-                                Phòng @(i + 102)
-                            </h5>
-                            <p class="text-muted mb-2">
-                                <i class="fas fa-tag me-1"></i>
-                                Phòng @(new[] { "Standard", "Deluxe", "VIP" }[i])
-                            </p>
-                            <ul class="room-features">
-                                <li><i class="fas fa-bed"></i> Giường đơn/đôi</li>
-                                <li><i class="fas fa-wifi"></i> WiFi miễn phí</li>
-                                <li><i class="fas fa-wind"></i> Điều hòa nhiệt độ</li>
-                            </ul>
-                            <div class="price">
-                                @((i + 1) * 500000).ToString("N0") đ
-                                <small class="d-block text-muted" style="font-size: 0.9rem;">/ đêm</small>
-                            </div>
-                            <a href="#" class="btn btn-view-detail w-100 mt-3">
-                                <i class="fas fa-eye me-2"></i>Xem chi tiết
-                            </a>
-                        </div>
-                    </div>
-                </div>
-            }
-        </div>
-    </div>
-</section>
-
 <script>
-    function changeMainImage(src) {
-        document.getElementById('mainImage').src = src;
-
-        // Update active thumbnail
-        document.querySelectorAll('.thumbnail').forEach(thumb => {
-            thumb.classList.remove('active');
-            if (thumb.src === src) {
-                thumb.classList.add('active');
-            }
-        });
+    function changeMainImage(src){
+    document.getElementById('mainImage').src = src;
     }
-
-    // Set minimum date for check-in
-    const today = new Date().toISOString().split('T')[0];
-    document.querySelectorAll('input[type="date"]').forEach(input => {
-        input.setAttribute('min', today);
-    });
 </script>
