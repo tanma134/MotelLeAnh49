@@ -54,17 +54,18 @@ namespace MotelLeAnh49.Controllers
         [HttpPost]
         public IActionResult Register(Account account, Customer customer)
         {
-            _authService.Register(account, customer);
+                // 1. Gọi service để kiểm tra (Service sẽ gọi Repo.Add, nơi quăng lỗi trùng)
+                // Lưu ý: Lúc này chưa nên lưu thật vào DB hoặc phải dùng Transaction
+                _authService.Register(account, customer);
 
-            string otp = _authService.GenerateOTP();
+                // 2. Nếu không lỗi trùng, mới tạo OTP
+                string otp = _authService.GenerateOTP();
+                HttpContext.Session.SetString("OTP", otp);
+                HttpContext.Session.SetString("Email", account.Email);
 
-            HttpContext.Session.SetString("OTP", otp);
-            HttpContext.Session.SetString("Email", account.Email);
+                _emailService.SendOTP(account.Email, otp);
 
-            // gửi OTP
-            _emailService.SendOTP(account.Email, otp);
-
-            return RedirectToAction("VerifyOTP");
+                return RedirectToAction("VerifyOTP");
         }
 
         // VERIFY OTP PAGE

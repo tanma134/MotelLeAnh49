@@ -2,6 +2,8 @@
 @{
     ViewData["Title"] = "Thêm khách hàng mới";
     Layout = "~/Views/Shared/_AdminLayout.cshtml";
+
+    var acc = new DataAccess.Models.Account();
 }
 
 <style>
@@ -132,12 +134,15 @@
 
         <div class="form-group">
             <label>Tên đăng nhập</label>
-            <input name="account.Username" placeholder="Tên đăng nhập..." required />
+            @* Giữ name để gửi dữ liệu về, và dùng chuỗi "Account.Username" để hứng lỗi *@
+            <input name="Account.Username" placeholder="Tên đăng nhập..." class="form-control" required />
+            <span asp-validation-for="Account.Username" class="text-danger"></span>
         </div>
 
         <div class="form-group">
             <label>Mật khẩu</label>
-            <input name="account.Password" type="password" placeholder="Nhập mật khẩu..." required />
+            <input name="Account.Password" type="password" placeholder="Nhập mật khẩu..." class="form-control" required />
+            <span asp-validation-for="Account.Password" class="text-danger"></span>
         </div>
 
         <div class="section-title">👤 Thông tin khách hàng</div>

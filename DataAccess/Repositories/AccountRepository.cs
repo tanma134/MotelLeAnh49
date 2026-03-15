@@ -33,6 +33,18 @@ namespace DataAccess.Repositories
 
         public void Add(Account account)
         {
+            // Check xem Username này đã có ai dùng chưa
+            var isUsernameDuplicate = _context.Accounts.Any(a => a.Username == account.Username);
+
+            if (isUsernameDuplicate)
+            {
+                // Quăng lỗi có chứa chữ "Username" để Controller "bắt bài" được
+                throw new Exception("This Username is already taken!");
+            }
+
+            if (_context.Accounts.Any(a => a.Email == account.Email))
+                throw new Exception("Email_Exists");
+
             _context.Accounts.Add(account);
         }
 

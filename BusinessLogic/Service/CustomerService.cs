@@ -15,32 +15,44 @@ namespace BusinessLogic.Service
 
         private readonly ICustomerRepository _customerRepo;
         private readonly IAccountRepository _accountRepo;
+        private readonly MotelDbContext _context;
 
-        public CustomerService(ICustomerRepository customerRepo, IAccountRepository accountRepo)
+        public CustomerService(ICustomerRepository customerRepo, IAccountRepository accountRepo, MotelDbContext context)
         {
             _customerRepo = customerRepo;
             _accountRepo = accountRepo;
+            _context = context;
         }
 
         public IEnumerable<Customer> GetAllCustomers()
         {
-            var allCustomers = _customerRepo.GetAll();
-
-            return allCustomers.Where(c => c.Account != null && c.Account.IsActive == true);
+            return _customerRepo.GetAll();
         }
 
         public void CreateCustomer(Customer customer, Account account)
         {
-            // Bước 1: Lưu Account trước để DB sinh ra cái Id tự tăng
-            _accountRepo.Add(account);
-            _accountRepo.Save();
+            using (var transaction = _context.Database.BeginTransaction())
+            {
+                try
+                {
+                    _accountRepo.Add(account);
+                    _accountRepo.Save();
 
-            // Bước 2: Lấy cái Id vừa sinh ra đó gán cho AccountId của khách hàng
-            customer.AccountId = account.Id;
+                    customer.AccountId = account.Id;
+                    customer.Account = null;
 
-            // Bước 3: Giờ mới lưu Customer vào bảng
-            _customerRepo.Add(customer);
-            _customerRepo.Save();
+                    _customerRepo.Add(customer);
+                    _customerRepo.Save();
+
+                    transaction.Commit();
+                }
+                catch (Exception)
+                {
+                    transaction.Rollback();
+
+                    throw;
+                }
+            }
         }
 
         public Customer GetCustomerById(int id)
@@ -50,25 +62,79 @@ namespace BusinessLogic.Service
 
         public void UpdateCustomer(Customer customer)
         {
-            // Repo đánh dấu thay đổi
-            _customerRepo.Update(customer);
-            // Lưu xuống DB
-            _customerRepo.Save();
+            using (var transaction = _context.Database.BeginTransaction())
+            {
+                try
+                {
+                    _customerRepo.Update(customer);
+                    _customerRepo.Save();
+
+                    var account = _accountRepo.GetById(customer.AccountId);
+                    if (account != null && account.Email != customer.Email)
+                    {
+                        account.Email = customer.Email;
+                        _accountRepo.Update(account);
+                        _accountRepo.Save();
+                    }
+
+                    transaction.Commit();
+                }
+                catch (Exception ex)
+                {
+                    transaction.Rollback();
+                    throw; 
+                }
+            }
         }
 
         public void DeleteCustomer(int customerId)
         {
-            var customer = _customerRepo.GetById(customerId);
-            if (customer != null)
+            // 1. Check xem có đơn hàng nào đang chạy không (Pending/Confirmed)
+            var hasActiveBooking = _context.Bookings.Any(b =>
+                b.CustomerId == customerId &&
+                (b.Status == "Pending" || b.Status == "Confirmed"));
+
+            if (hasActiveBooking)
             {
-                var account = _accountRepo.GetById(customer.AccountId);
-                if (account != null)
+                throw new Exception("Khách hàng đang có đơn đặt phòng chưa hoàn thành. Không thể xóa!");
+            }
+
+            // 2. Dùng Transaction để đảm bảo an toàn dữ liệu
+            using (var transaction = _context.Database.BeginTransaction())
+            {
+                try
                 {
-                    account.IsActive = false; // Xóa mềm
-                    _accountRepo.Update(account);
-                    _accountRepo.Save();
+                    var customer = _customerRepo.GetById(customerId);
+                    if (customer != null)
+                    {
+                        // Xử lý bảng Account (Xóa mềm hoặc Xóa cứng tùy bạn)
+                        var account = _accountRepo.GetById(customer.AccountId);
+                        if (account != null)
+                        {
+                            account.IsActive = false; // Xóa mềm Account
+                            _accountRepo.Update(account);
+                            _accountRepo.Save();
+                        }
+
+                        // Xử lý bảng Customer
+                        // Nếu muốn xóa hẳn Customer khỏi DB:
+                        _customerRepo.Delete(customer);
+                        _customerRepo.Save();
+
+                        transaction.Commit();
+                    }
+                }
+                catch (Exception)
+                {
+                    transaction.Rollback();
+                    throw new Exception("Có lỗi xảy ra khi xóa dữ liệu hệ thống.");
                 }
             }
+        }
+
+        public IEnumerable<Customer> SearchByIdentity(string cccd)
+        {
+            return _customerRepo.SearchByIdentity(cccd);
         }
     }
        

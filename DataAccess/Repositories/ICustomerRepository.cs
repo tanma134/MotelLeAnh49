@@ -17,5 +17,9 @@ namespace DataAccess.Repositories
         Customer GetById(int id);
 
         void Update(Customer customer);
+
+        void Delete(Customer customer);
+
+        IEnumerable<Customer> SearchByIdentity(string cccd);
     }
 }
