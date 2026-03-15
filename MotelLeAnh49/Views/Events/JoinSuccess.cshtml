@@ -1,0 +1,39 @@
+@model MotelLeAnh49.Models.JoinEventViewModel
+
+@{
+    ViewData["Title"] = "Đăng ký thành công";
+}
+
+<div class="container py-4">
+    <div class="card shadow-sm">
+        <div class="card-body text-center">
+            <h2 class="mb-3">Đăng ký tham gia thành công 🎉</h2>
+            <p class="mb-2">
+                Bạn đã đăng ký tham gia sự kiện <strong>@Model.Title</strong>.
+            </p>
+            <p class="mb-2">
+                Thời gian: @Model.EventDate.ToString("dd/MM/yyyy HH:mm")<br />
+                Địa điểm: @Model.Location
+            </p>
+
+            @if (Model.RegistrationId.HasValue)
+            {
+                <p class="mb-3">
+                    Mã đăng ký của bạn là: <strong>@Model.RegistrationId</strong><br />
+                    Vui lòng lưu lại mã này để có thể hủy đăng ký nếu cần.
+                </p>
+
+                <a asp-action="Cancel"
+                   asp-route-id="@Model.RegistrationId.Value"
+                   class="btn btn-outline-danger me-2">
+                    Hủy đăng ký
+                </a>
+            }
+
+            <a asp-action="List" class="btn btn-primary">
+                Xem các sự kiện khác
+            </a>
+        </div>
+    </div>
+</div>
+

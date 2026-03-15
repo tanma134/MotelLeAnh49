@@ -1,0 +1,123 @@
+﻿@{
+    ViewData["Title"] = "Dashboard";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+
+<link rel="stylesheet" href="~/css/dashboard.css">
+
+<div class="dashboard">
+
+    <h2>Dashboard & Report</h2>
+
+    <div class="card-container">
+
+        <div class="card blue">
+            <h4>Total Rooms</h4>
+            <h2>@ViewBag.TotalRooms</h2>
+        </div>
+
+        <div class="card green">
+            <h4>Rooms Booked</h4>
+            <h2>@ViewBag.BookedRooms</h2>
+        </div>
+
+        <div class="card yellow">
+            <h4>Rooms Empty</h4>
+            <h2>@ViewBag.EmptyRooms</h2>
+        </div>
+
+        <div class="card red">
+            <h4>Revenue Today</h4>
+            <h2>@ViewBag.TodayRevenue.ToString("N0") đ</h2>
+        </div>
+
+    </div>
+
+    <hr />
+
+    <h4>Top 5 Most Booked Rooms</h4>
+
+    <table class="table table-striped">
+
+        <thead>
+            <tr>
+                <th>Room</th>
+                <th>Bookings</th>
+            </tr>
+        </thead>
+
+        <tbody>
+
+            @foreach (var r in ViewBag.TopRooms)
+            {
+                <tr>
+                    <td>@r.Room</td>
+                    <td>@r.Count</td>
+                </tr>
+            }
+
+        </tbody>
+
+    </table>
+
+    <hr />
+
+    <h4>Revenue by Month</h4>
+
+    <canvas id="revenueChart"></canvas>
+
+    <br />
+
+    <a asp-action="ExportExcel" class="btn btn-success">
+        <i class="fas fa-file-excel"></i> Export Excel
+    </a>
+
+    <a asp-action="ExportPdf" class="btn btn-danger">
+        <i class="fas fa-file-pdf"></i> Export PDF
+    </a>
+
+</div>
+
+@section Scripts {
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <script>
+        var revenueData =
+        @Html.Raw(System.Text.Json.JsonSerializer.Serialize(ViewBag.RevenueByMonth));
+
+        var labels = revenueData.map(x => "Month " + x.Month);
+        var values = revenueData.map(x => x.Revenue);
+
+        new Chart(document.getElementById("revenueChart"), {
+
+            type: 'line',
+
+            data: {
+                labels: labels,
+                datasets: [{
+                    label: "Revenue",
+                    data: values,
+                    borderColor: "#3b82f6",
+                    backgroundColor: "rgba(59,130,246,0.3)",
+                    fill: true,
+                    tension: 0.3,
+
+                    pointRadius: 6,
+                    pointBackgroundColor: "#2563eb"
+                }]
+            },
+
+            options:{
+                responsive:true,
+                scales:{
+                    y:{
+                        beginAtZero:false
+                    }
+                }
+            }
+
+        });
+    </script>
+
+}

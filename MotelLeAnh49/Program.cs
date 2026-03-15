@@ -1,9 +1,12 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.EntityFrameworkCore;
 using MotelLeAnh49.Data;
 using DataAccess.Repositories;
 using DataAccess.Repositories.Interfaces;
 using BusinessLogic.Services;
 using BusinessLogic.Interfaces;
+using BusinessLogic.Service;
+using BusinessLogic.Config;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -12,27 +15,80 @@ var builder = WebApplication.CreateBuilder(args);
 // DbContext
 builder.Services.AddDbContext<MotelDbContext>(options =>
     options.UseSqlServer(
-        builder.Configuration.GetConnectionString("DefaultConnection")
-    ));
+        builder.Configuration.GetConnectionString("DefaultConnection")));
 
-// 👉 Repository
+// Repositories
 builder.Services.AddScoped<IRoomRepository, RoomRepository>();
 builder.Services.AddScoped<IAdminRepository, AdminRepository>();
+builder.Services.AddScoped<IAccountRepository, AccountRepository>();
+builder.Services.AddScoped<ICustomerRepository, CustomerRepository>();
+builder.Services.AddScoped<IBookingRepository, BookingRepository>();
+builder.Services.AddScoped<IEventRepository, EventRepository>();
+builder.Services.AddScoped<IEventRegistrationRepository, EventRegistrationRepository>();
 
-// 👉 Service
+// Services
 builder.Services.AddScoped<IRoomService, RoomService>();
 builder.Services.AddScoped<IAdminService, AdminService>();
+builder.Services.AddScoped<ICustomerService, CustomerService>();
+builder.Services.AddScoped<IBookingService, BookingService>();
+builder.Services.AddScoped<EmailService>();
+builder.Services.AddScoped<AuthService>();
+builder.Services.AddScoped<IEventService, EventService>();
+builder.Services.AddScoped<IEventRegistrationService, EventRegistrationService>();
 
-// MVC
-builder.Services.AddControllersWithViews();
+// Email config
+builder.Services.Configure<EmailSettings>(
+    builder.Configuration.GetSection("EmailSettings"));
 
-// Session
+// ================== SESSION ==================
+
 builder.Services.AddSession(options =>
 {
     options.IdleTimeout = TimeSpan.FromMinutes(30);
     options.Cookie.HttpOnly = true;
     options.Cookie.IsEssential = true;
 });
+
+// ================== AUTHENTICATION ==================
+
+builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
+.AddCookie(options =>
+{
+    options.Cookie.Name = "MotelAuthCookie";
+    options.ExpireTimeSpan = TimeSpan.FromHours(24);
+    options.SlidingExpiration = true;
+
+    // mặc định
+    options.LoginPath = "/Auth/Login";
+    options.AccessDeniedPath = "/Auth/AccessDenied";
+
+    // redirect đúng login page
+    options.Events.OnRedirectToLogin = context =>
+    {
+        if (context.Request.Path.StartsWithSegments("/Bookings"))
+        {
+            context.Response.Redirect("/Admin/Login");
+        }
+        else
+        {
+            context.Response.Redirect("/Auth/Login");
+        }
+
+        return Task.CompletedTask;
+    };
+});
+
+// ================== AUTHORIZATION ==================
+
+builder.Services.AddAuthorization(options =>
+{
+    options.AddPolicy("AdminOnly", policy =>
+        policy.RequireRole("Admin"));
+});
+
+// ================== MVC ==================
+
+builder.Services.AddControllersWithViews();
 
 var app = builder.Build();
 
@@ -49,8 +105,10 @@ app.UseStaticFiles();
 
 app.UseRouting();
 
+// Session trước Auth
 app.UseSession();
 
+app.UseAuthentication();
 app.UseAuthorization();
 
 // ================== ROUTING ==================

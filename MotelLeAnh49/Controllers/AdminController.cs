@@ -28,6 +28,7 @@ public class AdminController : Controller
 
         HttpContext.Session.SetInt32("AdminId", admin.Id);
         HttpContext.Session.SetString("AdminName", admin.FullName ?? "Admin");
+        HttpContext.Session.SetString("Role", "Admin");
 
         return RedirectToAction("Index", "Rooms");
     }

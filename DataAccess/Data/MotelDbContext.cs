@@ -18,7 +18,8 @@ namespace MotelLeAnh49.Data
         public DbSet<Account> Accounts { get; set; }
 
         public DbSet<Customer> Customers { get; set; }
-
+        public DbSet<Event> Events { get; set; }
+        public DbSet<DataAccess.Models.EventRegistration> EventRegistrations { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
