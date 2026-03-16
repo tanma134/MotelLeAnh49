@@ -1,0 +1,59 @@
+﻿.dashboard {
+    padding: 20px;
+}
+
+.card-container {
+    display: flex;
+    gap: 20px;
+    flex-wrap: wrap;
+    margin-bottom: 30px;
+}
+
+.card {
+    flex: 1;
+    min-width: 200px;
+    padding: 20px;
+    border-radius: 10px;
+    color: white;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+}
+
+    .card h4 {
+        font-size: 16px;
+        margin-bottom: 10px;
+    }
+
+    .card h2 {
+        font-size: 32px;
+        font-weight: bold;
+    }
+
+.blue {
+    background: linear-gradient(45deg,#3b82f6,#2563eb);
+}
+
+.green {
+    background: linear-gradient(45deg,#10b981,#059669);
+}
+
+.yellow {
+    background: linear-gradient(45deg,#f59e0b,#d97706);
+}
+
+.red {
+    background: linear-gradient(45deg,#ef4444,#dc2626);
+}
+
+table {
+    background: white;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+}
+
+canvas {
+    background: white;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 3px 10px rgba(0,0,0,0.15);
+}

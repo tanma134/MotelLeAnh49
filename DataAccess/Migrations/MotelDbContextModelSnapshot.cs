@@ -8,7 +8,7 @@ using MotelLeAnh49.Data;
 
 #nullable disable
 
-namespace MotelLeAnh49.Migrations
+namespace DataAccess.Migrations
 {
     [DbContext(typeof(MotelDbContext))]
     partial class MotelDbContextModelSnapshot : ModelSnapshot
@@ -102,6 +102,48 @@ namespace MotelLeAnh49.Migrations
                     b.ToTable("Customers");
                 });
 
+            modelBuilder.Entity("DataAccess.Models.EventRegistration", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime?>("CancelledAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Email")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<int>("EventId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("FullName")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<bool>("IsCancelled")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("Phone")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
+
+                    b.Property<DateTime>("RegisteredAt")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("EventId");
+
+                    b.ToTable("EventRegistrations");
+                });
+
             modelBuilder.Entity("MotelLeAnh49.Models.Admin", b =>
                 {
                     b.Property<int>("Id")
@@ -166,14 +208,81 @@ namespace MotelLeAnh49.Migrations
                     b.Property<int>("Children")
                         .HasColumnType("int");
 
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int?>("CustomerId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Email")
+                        .IsRequired()
+                        .HasMaxLength(150)
+                        .HasColumnType("nvarchar(150)");
+
+                    b.Property<string>("FullName")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<string>("Phone")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
+
                     b.Property<int>("RoomId")
                         .HasColumnType("int");
 
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
                     b.HasKey("Id");
+
+                    b.HasIndex("CustomerId");
 
                     b.HasIndex("RoomId");
 
                     b.ToTable("Bookings");
+                });
+
+            modelBuilder.Entity("MotelLeAnh49.Models.Event", b =>
+                {
+                    b.Property<int>("EventId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("EventId"));
+
+                    b.Property<string>("City")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("EventDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("ImageUrl")
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.Property<string>("Location")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
+
+                    b.Property<string>("Title")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
+
+                    b.HasKey("EventId");
+
+                    b.ToTable("Events");
                 });
 
             modelBuilder.Entity("MotelLeAnh49.Models.Room", b =>
@@ -255,13 +364,30 @@ namespace MotelLeAnh49.Migrations
                     b.Navigation("Account");
                 });
 
+            modelBuilder.Entity("DataAccess.Models.EventRegistration", b =>
+                {
+                    b.HasOne("MotelLeAnh49.Models.Event", "Event")
+                        .WithMany()
+                        .HasForeignKey("EventId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Event");
+                });
+
             modelBuilder.Entity("MotelLeAnh49.Models.Booking", b =>
                 {
+                    b.HasOne("DataAccess.Models.Customer", "Customer")
+                        .WithMany("Bookings")
+                        .HasForeignKey("CustomerId");
+
                     b.HasOne("MotelLeAnh49.Models.Room", "Room")
                         .WithMany()
                         .HasForeignKey("RoomId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.Navigation("Customer");
 
                     b.Navigation("Room");
                 });
@@ -292,6 +418,11 @@ namespace MotelLeAnh49.Migrations
                 {
                     b.Navigation("Customer")
                         .IsRequired();
+                });
+
+            modelBuilder.Entity("DataAccess.Models.Customer", b =>
+                {
+                    b.Navigation("Bookings");
                 });
 
             modelBuilder.Entity("MotelLeAnh49.Models.Admin", b =>

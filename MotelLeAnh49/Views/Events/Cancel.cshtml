@@ -1,0 +1,29 @@
+@model MotelLeAnh49.Models.JoinEventViewModel
+
+@{
+    ViewData["Title"] = "Hủy đăng ký sự kiện";
+}
+
+<div class="container py-4">
+    <div class="card shadow-sm">
+        <div class="card-body">
+            <h3 class="mb-3">Xác nhận hủy đăng ký</h3>
+            <p>
+                Bạn có chắc chắn muốn hủy đăng ký tham gia sự kiện
+                <strong>@Model.Title</strong> không?
+            </p>
+
+            <p class="mb-2">
+                Thời gian: @Model.EventDate.ToString("dd/MM/yyyy HH:mm")<br />
+                Địa điểm: @Model.Location
+            </p>
+
+            <form asp-action="Cancel" asp-route-id="@Model.RegistrationId" method="post">
+                @Html.AntiForgeryToken()
+                <button type="submit" class="btn btn-danger me-2">Xác nhận hủy</button>
+                <a asp-action="Details" asp-route-id="@Model.EventId" class="btn btn-secondary">Quay lại</a>
+            </form>
+        </div>
+    </div>
+</div>
+

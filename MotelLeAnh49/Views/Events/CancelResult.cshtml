@@ -1,0 +1,26 @@
+@{
+    ViewData["Title"] = "Kết quả hủy đăng ký";
+    var success = ViewBag.CancelSuccess as bool? ?? false;
+}
+
+<div class="container py-4">
+    <div class="card shadow-sm">
+        <div class="card-body text-center">
+            @if (success)
+            {
+                <h2 class="mb-3 text-success">Hủy đăng ký thành công</h2>
+                <p>Bạn đã hủy đăng ký tham gia sự kiện.</p>
+            }
+            else
+            {
+                <h2 class="mb-3 text-danger">Hủy đăng ký thất bại</h2>
+                <p>Không tìm thấy đăng ký hoặc đăng ký đã được hủy trước đó.</p>
+            }
+
+            <a asp-action="List" class="btn btn-primary mt-3">
+                Quay lại danh sách sự kiện
+            </a>
+        </div>
+    </div>
+</div>
+
