@@ -1,0 +1,66 @@
+@model MotelLeAnh49.Models.Event
+
+@{
+    var registrationId = ViewBag.RegistrationId as int?;
+}
+
+<div class="container py-5">
+
+    <a asp-action="List" class="btn btn-link mb-3">
+        ← Quay lại danh sách
+    </a>
+
+    <div class="card shadow">
+
+        <img src="@Model.ImageUrl"
+             style="height:350px;object-fit:cover;"
+             class="card-img-top" />
+
+        <div class="card-body">
+
+            <h2 class="mb-3">@Model.Title</h2>
+
+            <p class="text-muted">
+                <i class="fas fa-map-marker-alt"></i>
+                @Model.Location, @Model.City
+            </p>
+
+            <p class="text-muted">
+                <i class="far fa-calendar-alt"></i>
+                @Model.EventDate.ToString("dd/MM/yyyy HH:mm")
+            </p>
+
+            <hr />
+
+            <p style="font-size:17px">
+                @Model.Description
+            </p>
+
+            <div class="mt-4">
+
+                @if (registrationId == null)
+                {
+                    <a asp-action="Join"
+                       asp-route-id="@Model.EventId"
+                       class="btn btn-success btn-lg">
+
+                        🎟 Tham gia sự kiện
+                    </a>
+                }
+                else
+                {
+                    <a asp-action="Cancel"
+                       asp-route-id="@registrationId"
+                       class="btn btn-danger btn-lg">
+
+                        ❌ Hủy đăng ký
+                    </a>
+                }
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>

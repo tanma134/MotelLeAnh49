@@ -18,6 +18,7 @@ namespace MotelLeAnh49.Controllers
         }
 
         // TRANG CHỦ HIỂN THỊ DANH SÁCH PHÒNG
+
         public IActionResult Index()
         {
             var rooms = _context.Rooms
@@ -25,8 +26,16 @@ namespace MotelLeAnh49.Controllers
                 .OrderBy(r => r.RoomNumber)
                 .ToList();
 
+            var events = _context.Events
+                .OrderBy(e => e.EventDate)
+                .Take(5)
+                .ToList();
+
+            ViewBag.Events = events;
+
             return View(rooms);
         }
+
 
         public IActionResult Privacy()
         {

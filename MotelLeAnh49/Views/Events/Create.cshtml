@@ -1,0 +1,184 @@
+@model MotelLeAnh49.Models.Event
+
+@{
+    ViewData["Title"] = "Thêm sự kiện";
+}
+
+<style>
+    body {
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        background: #f5f7fa;
+        margin: 0;
+        padding: 20px;
+    }
+
+    .form-container {
+        max-width: 600px;
+        margin: 0 auto;
+        background: white;
+        padding: 40px;
+        border-radius: 12px;
+        box-shadow: 0 2px 15px rgba(0,0,0,0.1);
+    }
+
+    h2 {
+        color: #2c3e50;
+        margin-bottom: 30px;
+        font-size: 28px;
+        text-align: center;
+        border-bottom: 3px solid #3498db;
+        padding-bottom: 10px;
+    }
+
+    .form-group {
+        margin-bottom: 20px;
+    }
+
+    label {
+        display: block;
+        margin-bottom: 8px;
+        color: #555;
+        font-weight: 600;
+        font-size: 14px;
+    }
+
+    input, textarea {
+        width: 100%;
+        padding: 12px 16px;
+        border: 2px solid #e0e0e0;
+        border-radius: 8px;
+        font-size: 15px;
+        transition: all 0.3s ease;
+        box-sizing: border-box;
+    }
+
+    textarea {
+        min-height: 100px;
+        resize: vertical;
+    }
+
+        input:focus, textarea:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+    .button-group {
+        margin-top: 30px;
+        display: flex;
+        gap: 10px;
+    }
+
+    button {
+        flex: 1;
+        padding: 14px;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        border: none;
+        border-radius: 8px;
+        font-size: 16px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+        }
+
+    .btn-back {
+        flex: 1;
+        padding: 14px;
+        background: #95a5a6;
+        color: white;
+        text-decoration: none;
+        border-radius: 8px;
+        font-size: 16px;
+        font-weight: 600;
+        text-align: center;
+        transition: all 0.3s ease;
+        display: inline-block;
+    }
+
+        .btn-back:hover {
+            background: #7f8c8d;
+            transform: translateY(-2px);
+        }
+
+    .validation-error {
+        color: #e74c3c;
+        font-size: 13px;
+        margin-top: 5px;
+        display: block;
+    }
+
+    .validation-summary {
+        background: #fff3cd;
+        padding: 15px;
+        margin-bottom: 20px;
+        border-left: 4px solid #ffc107;
+        border-radius: 8px;
+        color: #856404;
+    }
+
+    small {
+        color: #7f8c8d;
+        font-size: 12px;
+    }
+</style>
+
+<div class="form-container">
+    <h2>➕ Thêm sự kiện mới</h2>
+
+    <form asp-action="Create" method="post" enctype="multipart/form-data">
+        <div asp-validation-summary="All" class="validation-summary"></div>
+
+        <div class="form-group">
+            <label asp-for="Title">Tiêu đề</label>
+            <input asp-for="Title" placeholder="VD: Sự kiện khai trương" required />
+            <span asp-validation-for="Title" class="validation-error"></span>
+        </div>
+
+        <div class="form-group">
+            <label asp-for="Description">Mô tả</label>
+            <textarea asp-for="Description" placeholder="Mô tả chi tiết sự kiện..." required></textarea>
+            <span asp-validation-for="Description" class="validation-error"></span>
+        </div>
+
+        <div class="form-group">
+            <label asp-for="Location">Địa điểm</label>
+            <input asp-for="Location" placeholder="VD: Sảnh chính tầng 1" required />
+            <span asp-validation-for="Location" class="validation-error"></span>
+        </div>
+
+        <div class="form-group">
+            <label asp-for="City">Thành phố</label>
+            <input asp-for="City" placeholder="VD: Hà Nội" required />
+            <span asp-validation-for="City" class="validation-error"></span>
+        </div>
+
+        <div class="form-group">
+            <label asp-for="EventDate">Ngày giờ diễn ra</label>
+            <input asp-for="EventDate" type="datetime-local" required />
+            <span asp-validation-for="EventDate" class="validation-error"></span>
+        </div>
+
+        <div class="form-group">
+            <label>Ảnh sự kiện</label>
+            <input type="file" name="ImageFile" accept="image/*" />
+            <small>Hoặc nhập đường dẫn ảnh bên dưới</small>
+        </div>
+
+        <div class="form-group">
+            <label asp-for="ImageUrl">Đường dẫn ảnh (URL)</label>
+            <input asp-for="ImageUrl" placeholder="/images/events/xxx.jpg hoặc để trống nếu chọn file" />
+            <span asp-validation-for="ImageUrl" class="validation-error"></span>
+        </div>
+
+        <div class="button-group">
+            <button type="submit">💾 Lưu sự kiện</button>
+            <a asp-action="Index" class="btn-back">⬅ Quay lại</a>
+        </div>
+    </form>
+</div>
