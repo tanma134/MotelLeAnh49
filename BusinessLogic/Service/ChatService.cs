@@ -8,51 +8,51 @@ namespace BusinessLogic.Service
         private readonly IOpenAIService _openAI;
         private readonly IChatRepository _repo;
         private readonly IRoomRepository _roomRepo;
+        private readonly IEventRepository _eventRepo;
         public ChatService(
      IOpenAIService openAI,
      IChatRepository repo,
-     IRoomRepository roomRepo)
+     IRoomRepository roomRepo,
+     IEventRepository eventRepo)
         {
             _openAI = openAI;
             _repo = repo;
             _roomRepo = roomRepo;
+            _eventRepo = eventRepo;
         }
 
         // Step 3: ProcessUserMessage — called by ChatController
         public async Task<string> ProcessUserMessageAsync(string userMessage)
         {
+            // lấy phòng
             var rooms = await _roomRepo.GetAvailableRoomsAsync();
             var roomData = string.Join("\n", rooms.Select(r =>
-            $"Room {r.RoomNumber} - {r.RoomType} - {r.DayPrice} VND"));
+                $"Room {r.RoomNumber} - {r.RoomType} - {r.DayPrice} VND"));
+
+            // lấy event
+            var events = await _eventRepo.GetUpcomingEventsAsync();
+            var eventData = string.Join("\n", events.Select(e =>
+                $"{e.Title} - {e.Location} - {e.EventDate:dd/MM/yyyy}"
+            ));
 
             var prompt = $"""
-    Available rooms in MotelLeAnh49:s
+Available rooms in MotelLeAnh49:
 
-    {roomData}
+{roomData}
 
-    User question:
-    {userMessage}
-    """;
+Upcoming events in Can Tho:
+
+{eventData}
+
+User question:
+{userMessage}
+
+Answer in Vietnamese and recommend rooms or events if relevant.
+""";
 
             var aiResponse = await _openAI.SendPromptAsync(prompt);
 
             return aiResponse;
-            //// Load history for context
-            //var history = await _repo.GetHistoryAsync(limit: 20);
-            //var historyTuples = history.SelectMany(m => new[]
-            //{
-            //("user",      m.UserMessage),
-            //("model", m.AiResponse)
-            //});
-
-            //// Step 4–6: Call Anthropic API
-            //var aiResponse = await _openAI.SendPromptAsync(userMessage, historyTuples);
-
-            //// Step 7–12: Save to DB
-            //await _repo.SaveChatAsync(userMessage, aiResponse);
-
-            //// Step 13: Return to ChatController
-            //return aiResponse;
         }
     }
 }

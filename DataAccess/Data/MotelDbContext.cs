@@ -18,12 +18,10 @@ namespace MotelLeAnh49.Data
         public DbSet<Account> Accounts { get; set; }
 
         public DbSet<Customer> Customers { get; set; }
-<<<<<<< HEAD
         public DbSet<ChatMessage> ChatMessages { get; set; }
-=======
         public DbSet<Event> Events { get; set; }
         public DbSet<DataAccess.Models.EventRegistration> EventRegistrations { get; set; }
->>>>>>> 168ad7cf96c49645bbb98922d29335bc486511f8
+
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

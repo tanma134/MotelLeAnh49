@@ -23,15 +23,12 @@ builder.Services.AddScoped<IAdminRepository, AdminRepository>();
 builder.Services.AddScoped<IAccountRepository, AccountRepository>();
 builder.Services.AddScoped<ICustomerRepository, CustomerRepository>();
 builder.Services.AddScoped<IBookingRepository, BookingRepository>();
-<<<<<<< HEAD
 builder.Services.AddScoped<IChatRepository, ChatRepository>();
-
-
-=======
 builder.Services.AddScoped<IEventRepository, EventRepository>();
 builder.Services.AddScoped<IEventRegistrationRepository, EventRegistrationRepository>();
 
->>>>>>> 168ad7cf96c49645bbb98922d29335bc486511f8
+
+
 // Services
 builder.Services.AddScoped<IRoomService, RoomService>();
 builder.Services.AddScoped<IAdminService, AdminService>();
@@ -39,7 +36,6 @@ builder.Services.AddScoped<ICustomerService, CustomerService>();
 builder.Services.AddScoped<IBookingService, BookingService>();
 builder.Services.AddScoped<EmailService>();
 builder.Services.AddScoped<AuthService>();
-<<<<<<< HEAD
 builder.Services.Configure<OpenAIConfig>(
     builder.Configuration.GetSection("OpenAI"));
 builder.Services.AddHttpClient<IOpenAIService, OpenAIService>(client =>
@@ -53,7 +49,7 @@ builder.Services.AddScoped<IChatService, ChatService>();
 builder.Services.Configure<EmailSettings>(
     builder.Configuration.GetSection("EmailSettings"));
 
-=======
+
 builder.Services.AddScoped<IEventService, EventService>();
 builder.Services.AddScoped<IEventRegistrationService, EventRegistrationService>();
 
@@ -61,7 +57,6 @@ builder.Services.AddScoped<IEventRegistrationService, EventRegistrationService>(
 builder.Services.Configure<EmailSettings>(
     builder.Configuration.GetSection("EmailSettings"));
 
->>>>>>> 168ad7cf96c49645bbb98922d29335bc486511f8
 // ================== SESSION ==================
 
 builder.Services.AddSession(options =>
