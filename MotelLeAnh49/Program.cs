@@ -23,6 +23,8 @@ builder.Services.AddScoped<IAdminRepository, AdminRepository>();
 builder.Services.AddScoped<IAccountRepository, AccountRepository>();
 builder.Services.AddScoped<ICustomerRepository, CustomerRepository>();
 builder.Services.AddScoped<IBookingRepository, BookingRepository>();
+builder.Services.AddScoped<IChatRepository, ChatRepository>();
+
 
 // Services
 builder.Services.AddScoped<IRoomService, RoomService>();
@@ -31,7 +33,15 @@ builder.Services.AddScoped<ICustomerService, CustomerService>();
 builder.Services.AddScoped<IBookingService, BookingService>();
 builder.Services.AddScoped<EmailService>();
 builder.Services.AddScoped<AuthService>();
-
+builder.Services.Configure<OpenAIConfig>(
+    builder.Configuration.GetSection("OpenAI"));
+builder.Services.AddHttpClient<IOpenAIService, OpenAIService>(client =>
+{
+    client.DefaultRequestHeaders.Add("x-api-key",
+        builder.Configuration["OpenAI:ApiKey"]);
+    client.DefaultRequestHeaders.Add("anthropic-version", "2023-06-01");
+});
+builder.Services.AddScoped<IChatService, ChatService>();
 // Email config
 builder.Services.Configure<EmailSettings>(
     builder.Configuration.GetSection("EmailSettings"));

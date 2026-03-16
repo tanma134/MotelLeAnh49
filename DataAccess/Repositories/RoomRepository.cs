@@ -77,5 +77,15 @@ namespace DataAccess.Repositories
                 b.CheckOut > checkIn
             );
         }
+
+        public async Task<List<Room>> GetAvailableRoomsAsync()
+        {
+            var now = DateTime.Now;
+
+            return await _context.Rooms
+                .Where(r => !_context.Bookings
+                    .Any(b => b.RoomId == r.Id && b.CheckOut > now))
+                .ToListAsync();
+        }
     }
 }

@@ -18,7 +18,7 @@ namespace MotelLeAnh49.Data
         public DbSet<Account> Accounts { get; set; }
 
         public DbSet<Customer> Customers { get; set; }
-
+        public DbSet<ChatMessage> ChatMessages { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -39,6 +39,14 @@ namespace MotelLeAnh49.Data
                     IsActive = true
                 }
             );
+            modelBuilder.Entity<ChatMessage>(entity =>
+            {
+                entity.HasKey(e => e.Id);
+                entity.Property(e => e.UserMessage).IsRequired().HasMaxLength(2000);
+                entity.Property(e => e.AiResponse).IsRequired();
+                entity.Property(e => e.CreatedAt).IsRequired();
+                // Bỏ HasOne Customer đi
+            });
         }
     }
 }
