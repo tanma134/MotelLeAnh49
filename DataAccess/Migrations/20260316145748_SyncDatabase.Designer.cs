@@ -12,8 +12,8 @@ using MotelLeAnh49.Data;
 namespace DataAccess.Migrations
 {
     [DbContext(typeof(MotelDbContext))]
-    [Migration("20260316103441_AddEvent")]
-    partial class AddEvent
+    [Migration("20260316145748_SyncDatabase")]
+    partial class SyncDatabase
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
