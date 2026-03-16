@@ -147,6 +147,100 @@
     </div>
 </section>
 
+<!-- EVENT SECTION -->
+<section class="py-5" id="events" style="background: var(--bs-light, #f8f9fa);">
+    <div class="container">
+        <div class="section-title">
+            <h2>Sự kiện nổi bật</h2>
+            <p>Khám phá các sự kiện đặc sắc tại Motel Lê Anh 49</p>
+        </div>
+
+        @{
+            var events = ViewBag.Events as IEnumerable<MotelLeAnh49.Models.Event>;
+        }
+
+        @if (events != null && events.Any())
+        {
+            <div class="row">
+                @foreach (var ev in events.Take(3))
+                {
+                    <div class="col-lg-4 col-md-6 mb-4">
+                        <div class="card h-100 shadow-sm border-0 room-card">
+                            <div class="card-body d-flex flex-column p-4">
+
+                                <div class="d-flex align-items-center mb-3">
+                                    <div style="width:48px; height:48px; background:#c9a84c;
+                                                border-radius:10px; display:flex;
+                                                align-items:center; justify-content:center;
+                                                flex-shrink:0;">
+                                        <i class="fas fa-calendar-star text-white fs-5"></i>
+                                    </div>
+                                    <div class="ms-3">
+                                        <span class="badge"
+                                              style="background:#fff3cd; color:#856404;
+                                                     font-size:0.75rem; font-weight:500;">
+                                            <i class="far fa-clock me-1"></i>
+                                            @ev.EventDate.ToString("dd/MM/yyyy")
+                                        </span>
+                                    </div>
+                                </div>
+
+                                <h5 class="fw-semibold mb-2">@ev.Title</h5>
+
+                                @if (!string.IsNullOrEmpty(ev.Location))
+                                {
+                                    <p class="text-muted mb-2" style="font-size:0.9rem;">
+                                        <i class="fas fa-map-marker-alt me-1"></i>
+                                        @ev.Location
+                                    </p>
+                                }
+
+                                @if (!string.IsNullOrEmpty(ev.Description))
+                                {
+                                    <p class="text-muted flex-grow-1" style="font-size:0.9rem; line-height:1.6;">
+                                        @(ev.Description.Length > 100
+                                            ? ev.Description.Substring(0, 100) + "..."
+                                            : ev.Description)
+                                    </p>
+                                }
+
+                                <div class="mt-3 d-flex gap-2">
+                                    <a asp-controller="Events"
+                                       asp-action="Details"
+                                       asp-route-id="@ev.EventId"
+                                       class="btn btn-outline-secondary btn-sm flex-grow-1">
+                                        <i class="fas fa-eye me-1"></i>Chi tiết
+                                    </a>
+                                    <a asp-controller="Events"
+                                       asp-action="Join"
+                                       asp-route-id="@ev.EventId"
+                                       class="btn btn-gold btn-sm flex-grow-1">
+                                        <i class="fas fa-user-plus me-1"></i>Tham gia
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                }
+            </div>
+
+            <div class="text-center mt-2">
+                <a asp-controller="Events" asp-action="List"
+                   class="btn btn-outline-secondary px-4">
+                    <i class="fas fa-calendar-alt me-2"></i>Xem tất cả sự kiện
+                </a>
+            </div>
+        }
+        else
+        {
+            <div class="text-center py-4 text-muted">
+                <i class="fas fa-calendar-times fa-2x mb-3 d-block"></i>
+                Hiện chưa có sự kiện nào.
+            </div>
+        }
+    </div>
+</section>
+
 <!-- ROOM LIST SECTION -->
 <section class="py-5" id="rooms">
     <div class="container">
