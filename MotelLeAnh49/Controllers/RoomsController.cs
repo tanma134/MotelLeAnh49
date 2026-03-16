@@ -1,18 +1,22 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using BusinessLogic.Interfaces;
 using MotelLeAnh49.Models;
-
+using Microsoft.AspNetCore.SignalR;
+using MotelLeAnh49.Hubs;
 public class RoomsController : Controller
 {
     private readonly IRoomService _roomService;
 
     private readonly IWebHostEnvironment _env;
+    private readonly IHubContext<RoomHub> _hubContext;
 
     public RoomsController(IRoomService roomService,
-                           IWebHostEnvironment env)
+                        IWebHostEnvironment env,
+                        IHubContext<RoomHub> hubContext)
     {
         _roomService = roomService;
         _env = env;
+        _hubContext = hubContext;
     }
 
     private bool IsAdmin()
@@ -70,6 +74,7 @@ public class RoomsController : Controller
         }
 
         _roomService.CreateRoom(room, adminId, imagePaths);
+        await _hubContext.Clients.All.SendAsync("RoomUpdated");
 
         return RedirectToAction(nameof(Index));
     }
@@ -121,7 +126,7 @@ public class RoomsController : Controller
         // Gọi service mới
         if (!_roomService.UpdateRoom(room, imagePaths, DeletedImageIds))
             return NotFound();
-
+        await _hubContext.Clients.All.SendAsync("RoomUpdated");
         return RedirectToAction(nameof(Index));
     }
 
@@ -139,9 +144,12 @@ public class RoomsController : Controller
 
     [HttpPost]
     [ValidateAntiForgeryToken]
-    public IActionResult DeleteConfirmed(int id)
+    public async Task<IActionResult> DeleteConfirmed(int id)
     {
         _roomService.DeleteRoom(id);
+
+        await _hubContext.Clients.All.SendAsync("RoomUpdated");
+
         return RedirectToAction(nameof(Index));
     }
 
@@ -149,17 +157,20 @@ public class RoomsController : Controller
     [HttpPost]
     public IActionResult Search(BookingViewModel model)
     {
-        if (!ModelState.IsValid)
-            return RedirectToAction("Index", "Home");
+        if (model.CheckIn.Date < DateTime.Today)
+            return BadRequest("Ngày nhận phòng không hợp lệ");
 
-        var availableRooms = _roomService.SearchAvailableRooms(
+        if (model.CheckOut <= model.CheckIn)
+            return BadRequest("Ngày trả phòng phải sau ngày nhận phòng");
+
+        var rooms = _roomService.SearchAvailableRooms(
             model.CheckIn,
             model.CheckOut,
             model.Adults,
             model.Children
         );
 
-        return View("AvailableRooms", availableRooms);
+        return PartialView("_AvailableRooms", rooms);
     }
 
     // ================= DETAIL =================
@@ -186,17 +197,4 @@ public class RoomsController : Controller
         return View("~/Views/Home/Detail.cshtml", room);
     }
 
-    // ================= BOOK =================
-    [HttpPost]
-    public IActionResult Book(int roomId, DateTime checkIn, DateTime checkOut)
-    {
-        if (!_roomService.BookRoom(roomId, checkIn, checkOut))
-        {
-            TempData["Error"] = "Phòng đã được đặt trong khoảng thời gian này.";
-            return RedirectToAction("Detail", new { id = roomId });
-        }
-
-        TempData["Success"] = "Đặt phòng thành công!";
-        return RedirectToAction("Detail", new { id = roomId });
-    }
 }

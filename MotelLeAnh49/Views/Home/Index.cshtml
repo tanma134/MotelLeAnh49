@@ -62,7 +62,6 @@
     </button>
 </div>
 
-<!-- BOOKING FORM SECTION -->
 <section class="booking-section" id="booking">
     <div class="container">
         <div class="booking-form">
@@ -70,44 +69,64 @@
                 <i class="fas fa-calendar-check me-2"></i>
                 Đặt phòng trực tuyến
             </h3>
-            <form>
+
+            <form id="searchForm">
+
                 <div class="row g-3">
+
                     <div class="col-md-3">
                         <label class="form-label">Ngày nhận phòng</label>
-                        <input type="date" class="form-control" required>
+                        <input type="date"
+                               name="CheckIn"
+                               class="form-control"
+                               required>
                     </div>
+
                     <div class="col-md-3">
                         <label class="form-label">Ngày trả phòng</label>
-                        <input type="date" class="form-control" required>
+                        <input type="date"
+                               name="CheckOut"
+                               class="form-control"
+                               required>
                     </div>
+
                     <div class="col-md-2">
                         <label class="form-label">Người lớn</label>
-                        <select class="form-select">
+                        <select name="Adults" class="form-select">
                             <option value="1">1</option>
                             <option value="2" selected>2</option>
                             <option value="3">3</option>
                             <option value="4">4</option>
                         </select>
                     </div>
+
                     <div class="col-md-2">
                         <label class="form-label">Trẻ em</label>
-                        <select class="form-select">
+                        <select name="Children" class="form-select">
                             <option value="0" selected>0</option>
                             <option value="1">1</option>
                             <option value="2">2</option>
-                            <option value="3">3</option>
                         </select>
                     </div>
+
                     <div class="col-md-2 d-flex align-items-end">
                         <button type="submit" class="btn btn-gold w-100">
                             <i class="fas fa-search me-2"></i>Tìm phòng
                         </button>
                     </div>
+
                 </div>
+
             </form>
+
         </div>
     </div>
 </section>
+
+<!-- Kết quả hiển thị -->
+<div class="container mt-4">
+    <div id="roomResults"></div>
+</div>
 
 <!-- ABOUT SECTION -->
 <section class="about-section">
@@ -465,4 +484,31 @@
     document.querySelectorAll('.room-card, .service-card, .promotion-card').forEach(el => {
         observer.observe(el);
     });
+</script>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+<script>
+
+    $("#searchForm").submit(function(e){
+
+        e.preventDefault();
+
+        $.ajax({
+
+            url: "/Rooms/Search",
+            type: "POST",
+            data: $(this).serialize(),
+
+            success: function(result){
+                $("#roomResults").html(result);
+            },
+
+            error: function(err){
+                alert(err.responseText);
+            }
+
+        });
+
+    });
+
 </script>
