@@ -1,0 +1,112 @@
+﻿@model DataAccess.Models.Customer
+<div class="profile-container">
+    <h2 class="profile-title">Hồ sơ cá nhân</h2>
+    <table class="profile-table">
+        <tr>
+            <td class="label">Họ tên</td>
+            <td class="value">@Model.FullName</td>
+        </tr>
+        <tr>
+            <td class="label">Email</td>
+            <td class="value">@Model.Email</td>
+        </tr>
+        <tr>
+            <td class="label">SĐT</td>
+            <td class="value">@Model.Phone</td>
+        </tr>
+        <tr>
+            <td class="label">CCCD</td>
+            <td class="value">@Model.IdentityNumber</td>
+        </tr>
+        <tr>
+            <td class="label">Địa chỉ</td>
+            <td class="value">@Model.Address</td>
+        </tr>
+
+    </table>
+    <div style="text-align:center; margin-top:20px;">
+        <a asp-action="Edit" class="btn btn-primary">
+            Chỉnh Sửa Hồ Sơ
+        </a>
+    </div>
+<style>
+    .profile-container {
+        max-width: 600px;
+        margin: 30px auto;
+        padding: 30px;
+        background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+        border-radius: 12px;
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+    }
+
+    .profile-title {
+        text-align: center;
+        color: #2c3e50;
+        font-size: 28px;
+        font-weight: 600;
+        margin-bottom: 25px;
+        border-bottom: 3px solid #3498db;
+        padding-bottom: 15px;
+    }
+
+    .profile-table {
+        width: 100%;
+        border-collapse: collapse;
+        background: white;
+        border-radius: 8px;
+        overflow: hidden;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    }
+
+        .profile-table tr {
+            border-bottom: 1px solid #ecf0f1;
+            transition: background-color 0.3s ease;
+        }
+
+            .profile-table tr:hover {
+                background-color: #f8f9fa;
+            }
+
+            .profile-table tr:last-child {
+                border-bottom: none;
+            }
+
+        .profile-table td {
+            padding: 16px 20px;
+        }
+
+        .profile-table .label {
+            font-weight: 600;
+            color: #34495e;
+            width: 30%;
+            background-color: #ecf0f1;
+            border-right: 2px solid #bdc3c7;
+        }
+
+        .profile-table .value {
+            color: #2c3e50;
+            font-size: 16px;
+            word-break: break-word;
+        }
+
+    @@media (max-width: 768px) {
+        .profile-container {
+            margin: 20px;
+            padding: 20px;
+        }
+
+        .profile-title {
+            font-size: 24px;
+            margin-bottom: 20px;
+        }
+
+        .profile-table td {
+            padding: 12px 15px;
+            font-size: 14px;
+        }
+
+        .profile-table .label {
+            width: 40%;
+        }
+    }
+</style>

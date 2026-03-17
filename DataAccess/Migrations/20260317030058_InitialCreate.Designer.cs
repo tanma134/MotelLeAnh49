@@ -12,8 +12,8 @@ using MotelLeAnh49.Data;
 namespace DataAccess.Migrations
 {
     [DbContext(typeof(MotelDbContext))]
-    [Migration("20260316150341_AddServiceItem")]
-    partial class AddServiceItem
+    [Migration("20260317030058_InitialCreate")]
+    partial class InitialCreate
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -58,7 +58,35 @@ namespace DataAccess.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("Username")
+                        .IsUnique();
+
                     b.ToTable("Accounts");
+                });
+
+            modelBuilder.Entity("DataAccess.Models.ChatMessage", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("AiResponse")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("UserMessage")
+                        .IsRequired()
+                        .HasMaxLength(2000)
+                        .HasColumnType("nvarchar(2000)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("ChatMessages");
                 });
 
             modelBuilder.Entity("DataAccess.Models.Customer", b =>
@@ -100,6 +128,12 @@ namespace DataAccess.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("AccountId")
+                        .IsUnique();
+
+                    b.HasIndex("IdentityNumber")
+                        .IsUnique();
+
+                    b.HasIndex("Phone")
                         .IsUnique();
 
                     b.ToTable("Customers");

@@ -27,13 +27,29 @@ namespace BusinessLogic.Service
             // lấy phòng
             var rooms = await _roomRepo.GetAvailableRoomsAsync();
             var roomData = string.Join("\n", rooms.Select(r =>
-                $"Room {r.RoomNumber} - {r.RoomType} - {r.DayPrice} VND"));
+ $"""
+Room {r.RoomNumber}
+- Loại phòng: {r.RoomType}
+- Giá qua đêm: {r.OvernightPrice} VND
+- Giá theo ngày: {r.DayPrice} VND
+- Giá giờ đầu: {r.FirstHourPrice} VND
+- Giá giờ tiếp theo: {r.NextHourPrice} VND
+- Số khách tối đa: {r.MaxGuests}
+- Phí thêm khách: {r.ExtraGuestFee} VND
+"""
+ ));
 
             // lấy event
             var events = await _eventRepo.GetUpcomingEventsAsync();
             var eventData = string.Join("\n", events.Select(e =>
-                $"{e.Title} - {e.Location} - {e.EventDate:dd/MM/yyyy}"
-            ));
+   $"""
+Sự kiện: {e.Title}
+- Mô tả: {e.Description}
+- Địa điểm: {e.Location}
+- Thành phố: {e.City}
+- Ngày diễn ra: {e.EventDate:dd/MM/yyyy}
+"""
+   ));
 
             var prompt = $"""
 Available rooms in MotelLeAnh49:

@@ -598,3 +598,24 @@ footer {
     border-top-left-radius: 12px;
     border-top-right-radius: 12px;
 }
+.chat-floating {
+    position: fixed;
+    bottom: 20px; /* cách đáy */
+    right: 20px; /* cách bên phải */
+    list-style: none;
+    z-index: 9999;
+}
+
+.chat-btn {
+    background-color: #007bff;
+    color: white !important;
+    padding: 12px 18px;
+    border-radius: 30px;
+    font-weight: 500;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+    text-decoration: none;
+}
+
+    .chat-btn:hover {
+        background-color: #0056b3;
+    }

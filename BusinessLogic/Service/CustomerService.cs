@@ -27,7 +27,18 @@ namespace BusinessLogic.Service
         {
             return _customerRepo.GetAll();
         }
-
+        public bool IsEmailDuplicate(string email, int customerId)
+        {
+            return _context.Customers.Any(c =>
+                c.Email == email &&
+                c.Id != customerId);
+        }
+        public bool IsPhoneDuplicate(string phone, int customerId)
+        {
+            return _context.Customers.Any(c =>
+                c.Phone == phone &&
+                c.Id != customerId);
+        }
         public void CreateCustomer(Customer customer, Account account)
         {
             using (var transaction = _context.Database.BeginTransaction())
@@ -58,30 +69,43 @@ namespace BusinessLogic.Service
             return _customerRepo.GetById(id);
         }
 
-        public void UpdateCustomer(Customer customer)
+
+       public void UpdateCustomer(Customer customer)
+    {
+        // 🆕 Kiểm tra email trùng lặp
+        if (IsEmailDuplicate(customer.Email, customer.Id))
         {
-            using (var transaction = _context.Database.BeginTransaction())
+            throw new Exception("Email này đã được sử dụng bởi khách hàng khác!");
+        }
+
+        // 🆕 Kiểm tra phone trùng lặp
+        if (IsPhoneDuplicate(customer.Phone, customer.Id))
+        {
+            throw new Exception("Số điện thoại này đã được sử dụng bởi khách hàng khác!");
+        }
+
+        using (var transaction = _context.Database.BeginTransaction())
+        {
+            try
             {
-                try
-                {
-                    _customerRepo.Update(customer);
-                    _customerRepo.Save();
+                _customerRepo.Update(customer);
+                _customerRepo.Save();
 
-                    var account = _accountRepo.GetById(customer.AccountId);
-                    if (account != null && account.Email != customer.Email)
-                    {
-                        account.Email = customer.Email;
-                        _accountRepo.Update(account);
-                        _accountRepo.Save();
-                    }
-
-                    transaction.Commit();
-                }
-                catch (Exception)
+                var account = _accountRepo.GetById(customer.AccountId);
+                if (account != null && account.Email != customer.Email)
                 {
-                    transaction.Rollback();
-                    throw;
+                    account.Email = customer.Email;
+                    _accountRepo.Update(account);
+                    _accountRepo.Save();
                 }
+
+                transaction.Commit();
+            }
+            catch (Exception)
+            {
+                transaction.Rollback();
+                throw;
+            }
             }
         }
 
@@ -130,5 +154,11 @@ namespace BusinessLogic.Service
         {
             return _customerRepo.SearchByIdentity(cccd);
         }
+        public Customer GetProfile(int accountId)
+        {
+            return _context.Customers
+                .FirstOrDefault(c => c.AccountId == accountId);
+        }
+
     }
 }

@@ -16,9 +16,14 @@ namespace BusinessLogic.Service
         Customer GetCustomerById(int id);
 
         void UpdateCustomer(Customer customer);
-
+        Customer GetProfile(int id);
         void DeleteCustomer(int customerId);
 
         IEnumerable<Customer> SearchByIdentity(string cccd);
+
+        //  Kiểm tra email/phone trùng lặp
+        bool IsEmailDuplicate(string email, int customerId);
+        bool IsPhoneDuplicate(string phone, int customerId);
+
     }
 }
