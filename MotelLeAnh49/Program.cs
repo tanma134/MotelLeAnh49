@@ -106,6 +106,7 @@ builder.Services.AddAuthorization(options =>
 // ================== MVC ==================
 
 builder.Services.AddControllersWithViews();
+builder.Services.AddSignalR();
 
 var app = builder.Build();
 
@@ -133,5 +134,5 @@ app.UseAuthorization();
 app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Home}/{action=Index}/{id?}");
-
+app.MapHub<MotelLeAnh49.Hubs.RoomHub>("/roomHub");
 app.Run();

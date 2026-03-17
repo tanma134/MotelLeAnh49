@@ -16,7 +16,7 @@ namespace MotelLeAnh49.Data
         public DbSet<RoomImage> RoomImages { get; set; }
         public DbSet<Booking> Bookings { get; set; }
         public DbSet<Account> Accounts { get; set; }
-
+        public DbSet<ServiceItem> ServiceItems { get; set; }
         public DbSet<Customer> Customers { get; set; }
         public DbSet<ChatMessage> ChatMessages { get; set; }
         public DbSet<Event> Events { get; set; }

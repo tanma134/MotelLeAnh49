@@ -33,6 +33,8 @@ namespace MotelLeAnh49.Controllers
                 return View();
             }
 
+            if (!account.IsActive)
+                return null;
             // Lưu session
             HttpContext.Session.SetString("Username", account.Username);
             HttpContext.Session.SetString("Role", account.Role);
@@ -54,14 +56,28 @@ namespace MotelLeAnh49.Controllers
         [HttpPost]
         public IActionResult Register(Account account, Customer customer)
         {
-            _authService.Register(account, customer);
+            if (_authService.IsUsernameExist(account.Username))
+            {
+                ViewBag.Error = "Username đã tồn tại";
+                return View();
+            }
+
+            if (_authService.IsEmailExist(account.Email))
+            {
+                ViewBag.Error = "Email đã được sử dụng";
+                return View();
+            }
 
             string otp = _authService.GenerateOTP();
 
             HttpContext.Session.SetString("OTP", otp);
-            HttpContext.Session.SetString("Email", account.Email);
+            HttpContext.Session.SetString("OTPTime", DateTime.Now.ToString());
 
-            // gửi OTP
+            HttpContext.Session.SetString("RegUsername", account.Username);
+            HttpContext.Session.SetString("RegEmail", account.Email);
+            HttpContext.Session.SetString("RegPassword", account.Password);
+            HttpContext.Session.SetString("RegFullName", customer.FullName);
+
             _emailService.SendOTP(account.Email, otp);
 
             return RedirectToAction("VerifyOTP");
@@ -78,20 +94,57 @@ namespace MotelLeAnh49.Controllers
         public IActionResult VerifyOTP(string otp)
         {
             string? sessionOtp = HttpContext.Session.GetString("OTP");
+            string? otpTimeString = HttpContext.Session.GetString("OTPTime");
 
-            if (sessionOtp == null || otp != sessionOtp)
+            if (sessionOtp == null || otpTimeString == null)
+            {
+                ViewBag.Error = "OTP không hợp lệ";
+                return View();
+            }
+
+            DateTime otpTime = DateTime.Parse(otpTimeString);
+
+            if ((DateTime.Now - otpTime).TotalMinutes > 5)
+            {
+                ViewBag.Error = "OTP đã hết hạn";
+                return View();
+            }
+
+            if (otp != sessionOtp)
             {
                 ViewBag.Error = "OTP không đúng";
                 return View();
             }
 
-            // activate account
-            string email = HttpContext.Session.GetString("Email");
-            _authService.ActivateAccount(email);
+            // lấy dữ liệu đăng ký
+            var username = HttpContext.Session.GetString("RegUsername");
+            var email = HttpContext.Session.GetString("RegEmail");
+            var password = HttpContext.Session.GetString("RegPassword");
+            var fullName = HttpContext.Session.GetString("RegFullName");
 
-            ViewBag.Success = "Xác thực thành công! Đang chuyển đến trang login...";
+            var account = new Account
+            {
+                Username = username,
+                Email = email,
+                Password = password
+            };
 
-            return View();
+            var customer = new Customer
+            {
+                FullName = fullName
+            };
+
+            _authService.Register(account, customer);
+
+            // clear session
+            HttpContext.Session.Remove("OTP");
+            HttpContext.Session.Remove("OTPTime");
+            HttpContext.Session.Remove("RegUsername");
+            HttpContext.Session.Remove("RegEmail");
+            HttpContext.Session.Remove("RegPassword");
+            HttpContext.Session.Remove("RegFullName");
+
+            return RedirectToAction("Login");
         }
         public IActionResult ForgotPassword()
         {
