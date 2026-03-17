@@ -134,13 +134,16 @@
 
         <div class="form-group">
             <label>Tên đăng nhập</label>
+
             @* Giữ name để gửi dữ liệu về, và dùng chuỗi "Account.Username" để hứng lỗi *@
             <input name="Account.Username" placeholder="Tên đăng nhập..." class="form-control" required />
             <span asp-validation-for="Account.Username" class="text-danger"></span>
+
         </div>
 
         <div class="form-group">
             <label>Mật khẩu</label>
+
             <input name="Account.Password" type="password" placeholder="Nhập mật khẩu..." class="form-control" required />
             <span asp-validation-for="Account.Password" class="text-danger"></span>
         </div>

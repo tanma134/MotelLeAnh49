@@ -71,7 +71,8 @@
             <i class="fas fa-bed"></i> Manage Room
         </a>
 
-        <a asp-controller="AdminEvent" asp-action="Index">
+        <a asp-controller="Events" asp-action="Index">
+
             <i class="fas fa-tags"></i> Manage Event
         </a>
 
@@ -93,6 +94,31 @@
     </div>
 
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+
+
+    <!-- SignalR -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/7.0.5/signalr.min.js"></script>
+
+    <script>
+
+        const connection = new signalR.HubConnectionBuilder()
+            .withUrl("/roomHub")
+            .build();
+
+        connection.on("RoomUpdated", function () {
+
+            console.log("Room updated");
+
+            // reload page khi room thay đổi
+            location.reload();
+
+        });
+
+        connection.start().catch(err => console.error(err));
+
+    </script>
+
     @RenderSection("Scripts", required: false)
 </body>
+
 </html>

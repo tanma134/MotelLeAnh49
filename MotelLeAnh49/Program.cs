@@ -23,6 +23,7 @@ builder.Services.AddScoped<IAdminRepository, AdminRepository>();
 builder.Services.AddScoped<IAccountRepository, AccountRepository>();
 builder.Services.AddScoped<ICustomerRepository, CustomerRepository>();
 builder.Services.AddScoped<IBookingRepository, BookingRepository>();
+builder.Services.AddScoped<IChatRepository, ChatRepository>();
 builder.Services.AddScoped<IEventRepository, EventRepository>();
 builder.Services.AddScoped<IEventRegistrationRepository, EventRegistrationRepository>();
 
@@ -33,6 +34,22 @@ builder.Services.AddScoped<ICustomerService, CustomerService>();
 builder.Services.AddScoped<IBookingService, BookingService>();
 builder.Services.AddScoped<EmailService>();
 builder.Services.AddScoped<AuthService>();
+
+
+builder.Services.Configure<OpenAIConfig>(
+    builder.Configuration.GetSection("OpenAI"));
+builder.Services.AddHttpClient<IOpenAIService, OpenAIService>(client =>
+{
+    client.DefaultRequestHeaders.Add("x-api-key",
+        builder.Configuration["OpenAI:ApiKey"]);
+    client.DefaultRequestHeaders.Add("anthropic-version", "2023-06-01");
+});
+builder.Services.AddScoped<IChatService, ChatService>();
+// Email config
+builder.Services.Configure<EmailSettings>(
+    builder.Configuration.GetSection("EmailSettings"));
+
+
 builder.Services.AddScoped<IEventService, EventService>();
 builder.Services.AddScoped<IEventRegistrationService, EventRegistrationService>();
 
@@ -90,6 +107,8 @@ builder.Services.AddAuthorization(options =>
 
 builder.Services.AddControllersWithViews();
 
+builder.Services.AddSignalR();
+
 var app = builder.Build();
 
 // ================== MIDDLEWARE ==================
@@ -116,5 +135,5 @@ app.UseAuthorization();
 app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Home}/{action=Index}/{id?}");
-
+app.MapHub<MotelLeAnh49.Hubs.RoomHub>("/roomHub");
 app.Run();

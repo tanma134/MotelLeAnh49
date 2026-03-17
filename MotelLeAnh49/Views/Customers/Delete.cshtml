@@ -110,6 +110,7 @@
             transform: translateY(-2px);
         }
 
+
     /* Style mới cho thông báo lỗi */
     .alert-danger ul {
         list-style: none;
@@ -129,12 +130,12 @@
         font-weight: 500;
         border-left: 5px solid #c0392b !important; /* Tạo điểm nhấn bên trái */
     }
+
 </style>
 
 <div class="delete-container">
     <div class="warning-icon">🚫</div>
     <h2>Xác nhận khóa khách hàng</h2>
-
     @if (!ViewData.ModelState.IsValid)
     {
         <div class="alert alert-danger" style="background-color: #f8d7da; color: #721c24; padding: 15px; border-radius: 8px; margin-bottom: 20px; border: 1px solid #f5c6cb; text-align: left;">
@@ -168,3 +169,4 @@
         </div>
     </form>
 </div>
+

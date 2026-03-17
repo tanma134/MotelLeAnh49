@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -22,15 +22,14 @@ namespace DataAccess.Repositories
         {
             return _context.Customers
                     .Include(c => c.Account)
-                    .Where(c => c.Account != null && c.Account.IsActive == true) // Chặn ở đây luôn
+                    .Where(c => c.Account != null && c.Account.IsActive == true)
                     .ToList();
         }
 
-        // Trong CustomerRepository.cs
         public IEnumerable<Customer> SearchByIdentity(string cccd)
         {
             return _context.Customers
-                    .Include(c => c.Account) // Bắt buộc phải Include để lấy dữ liệu bảng Account
+                    .Include(c => c.Account)
                     .Where(c => c.IdentityNumber.Contains(cccd)
                                 && c.Account != null
                                 && c.Account.IsActive == true)
@@ -42,22 +41,28 @@ namespace DataAccess.Repositories
             // Check IdentityNumber
             if (_context.Customers.Any(c => c.IdentityNumber == customer.IdentityNumber))
             {
-                throw new Exception("Identity Number exists"); // Quăng "tín hiệu" lỗi
+                throw new Exception("Identity Number exists");
             }
 
             // Check Phone
             if (_context.Customers.Any(c => c.Phone == customer.Phone))
             {
-                throw new Exception("Phone Number exists"); // Quăng "tín hiệu" lỗi
+                throw new Exception("Phone Number exists");
             }
 
+            // Check Email
             if (_context.Customers.Any(c => c.Email == customer.Email && c.Id != customer.Id))
+            {
                 throw new Exception("Email exists");
+            }
 
             _context.Customers.Add(customer);
         }
 
-        public void Save() => _context.SaveChanges();
+        public void Save()
+        {
+            _context.SaveChanges();
+        }
 
         public Customer GetById(int id)
         {
@@ -66,12 +71,13 @@ namespace DataAccess.Repositories
 
         public void Update(Customer customer)
         {
+            // Check IdentityNumber duplicate
             if (_context.Customers.Any(c => c.IdentityNumber == customer.IdentityNumber && c.Id != customer.Id))
             {
                 throw new Exception("Identity Number exists");
             }
 
-            // 2. Check Phone: Tìm xem có AI KHÁC đang dùng số Phone này không
+            // Check Phone duplicate
             if (_context.Customers.Any(c => c.Phone == customer.Phone && c.Id != customer.Id))
             {
                 throw new Exception("Phone Number exists");

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -12,7 +12,6 @@ namespace BusinessLogic.Service
 {
     public class CustomerService : ICustomerService
     {
-
         private readonly ICustomerRepository _customerRepo;
         private readonly IAccountRepository _accountRepo;
         private readonly MotelDbContext _context;
@@ -49,7 +48,6 @@ namespace BusinessLogic.Service
                 catch (Exception)
                 {
                     transaction.Rollback();
-
                     throw;
                 }
             }
@@ -79,17 +77,17 @@ namespace BusinessLogic.Service
 
                     transaction.Commit();
                 }
-                catch (Exception ex)
+                catch (Exception)
                 {
                     transaction.Rollback();
-                    throw; 
+                    throw;
                 }
             }
         }
 
         public void DeleteCustomer(int customerId)
         {
-            // 1. Check xem có đơn hàng nào đang chạy không (Pending/Confirmed)
+            // Check khách có booking đang hoạt động không
             var hasActiveBooking = _context.Bookings.Any(b =>
                 b.CustomerId == customerId &&
                 (b.Status == "Pending" || b.Status == "Confirmed"));
@@ -99,7 +97,6 @@ namespace BusinessLogic.Service
                 throw new Exception("Khách hàng đang có đơn đặt phòng chưa hoàn thành. Không thể xóa!");
             }
 
-            // 2. Dùng Transaction để đảm bảo an toàn dữ liệu
             using (var transaction = _context.Database.BeginTransaction())
             {
                 try
@@ -107,17 +104,14 @@ namespace BusinessLogic.Service
                     var customer = _customerRepo.GetById(customerId);
                     if (customer != null)
                     {
-                        // Xử lý bảng Account (Xóa mềm hoặc Xóa cứng tùy bạn)
                         var account = _accountRepo.GetById(customer.AccountId);
                         if (account != null)
                         {
-                            account.IsActive = false; // Xóa mềm Account
+                            account.IsActive = false; // soft delete account
                             _accountRepo.Update(account);
                             _accountRepo.Save();
                         }
 
-                        // Xử lý bảng Customer
-                        // Nếu muốn xóa hẳn Customer khỏi DB:
                         _customerRepo.Delete(customer);
                         _customerRepo.Save();
 
@@ -137,5 +131,4 @@ namespace BusinessLogic.Service
             return _customerRepo.SearchByIdentity(cccd);
         }
     }
-       
 }

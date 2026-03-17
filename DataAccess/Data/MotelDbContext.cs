@@ -16,10 +16,12 @@ namespace MotelLeAnh49.Data
         public DbSet<RoomImage> RoomImages { get; set; }
         public DbSet<Booking> Bookings { get; set; }
         public DbSet<Account> Accounts { get; set; }
-
+        public DbSet<ServiceItem> ServiceItems { get; set; }
         public DbSet<Customer> Customers { get; set; }
+        public DbSet<ChatMessage> ChatMessages { get; set; }
         public DbSet<Event> Events { get; set; }
         public DbSet<DataAccess.Models.EventRegistration> EventRegistrations { get; set; }
+
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -52,6 +54,14 @@ namespace MotelLeAnh49.Data
                     IsActive = true
                 }
             );
+            modelBuilder.Entity<ChatMessage>(entity =>
+            {
+                entity.HasKey(e => e.Id);
+                entity.Property(e => e.UserMessage).IsRequired().HasMaxLength(2000);
+                entity.Property(e => e.AiResponse).IsRequired();
+                entity.Property(e => e.CreatedAt).IsRequired();
+                // Bỏ HasOne Customer đi
+            });
         }
     }
 }

@@ -21,5 +21,6 @@ namespace DataAccess.Repositories
         void Delete(Customer customer);
 
         IEnumerable<Customer> SearchByIdentity(string cccd);
+
     }
 }

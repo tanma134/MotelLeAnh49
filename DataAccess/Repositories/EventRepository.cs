@@ -1,3 +1,5 @@
+
+using Microsoft.EntityFrameworkCore;
 using MotelLeAnh49.Data;
 using MotelLeAnh49.Models;
 
@@ -39,5 +41,14 @@ namespace DataAccess.Repositories
                 _context.SaveChanges();
             }
         }
+
+        public async Task<List<Event>> GetUpcomingEventsAsync()
+        {
+            return await _context.Events
+                .Where(e => e.EventDate >= DateTime.Now)
+                .OrderBy(e => e.EventDate)
+                .ToListAsync();
+        }
+
     }
 }

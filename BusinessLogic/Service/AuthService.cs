@@ -20,6 +20,16 @@ namespace BusinessLogic.Service
             _context = context;
         }
 
+        public bool IsUsernameExist(string username)
+        {
+            return _repo.GetByUsername(username) != null;
+        }
+
+        public bool IsEmailExist(string email)
+        {
+            return _repo.GetByEmail(email) != null;
+        }
+
         public Account? Login(string username, string password)
         {
             var account = _repo.GetByUsername(username);
@@ -33,16 +43,27 @@ namespace BusinessLogic.Service
             return account;
         }
 
-        public void Register(Account account, Customer customer)
+
+        public bool Register(Account account, Customer customer)
         {
+            if (IsUsernameExist(account.Username))
+                return false;
+
+            if (IsEmailExist(account.Email))
+                return false;
+
             account.Password = HashPassword(account.Password);
             account.Role = "Customer";
             account.IsActive = false;
+
             _repo.Add(account);
             _repo.Save();
+
             customer.AccountId = account.Id;
             _context.Customers.Add(customer);
             _context.SaveChanges();
+
+            return true;
         }
         public Account GetByEmail(string email)
         {

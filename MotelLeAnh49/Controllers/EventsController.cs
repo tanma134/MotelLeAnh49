@@ -15,88 +15,163 @@ namespace MotelLeAnh49.Controllers
             _eventService = eventService;
             _eventRegistrationService = eventRegistrationService;
         }
+
         private bool IsAdmin()
         {
             return HttpContext.Session.GetInt32("AdminId") != null;
         }
+
         // LIST (ADMIN)
         public IActionResult Index()
         {
             if (!IsAdmin())
                 return RedirectToAction("Login", "Admin");
+
             var events = _eventService.GetAllEvents();
             return View(events);
         }
+
         // UC-52: VIEW EVENT LIST (GUEST)
         public IActionResult List()
         {
             var events = _eventService.GetAllEvents();
             return View(events);
         }
+
         // UC-53: VIEW EVENT DETAIL (USER)
         public IActionResult Details(int id)
         {
             var ev = _eventService.GetEventById(id);
             if (ev == null) return NotFound();
+
+            var registrationId = HttpContext.Session.GetInt32("RegisteredEvent_" + id);
+            ViewBag.RegistrationId = registrationId;
+
             return View(ev);
         }
+
         // UC-49: CREATE
         public IActionResult Create()
         {
             if (!IsAdmin())
                 return RedirectToAction("Login", "Admin");
+
             return View();
         }
+
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult Create(Event ev)
+        public IActionResult Create(Event ev, IFormFile? ImageFile)
         {
             if (!IsAdmin())
                 return RedirectToAction("Login", "Admin");
+
             if (!ModelState.IsValid)
                 return View(ev);
+
+            // upload ảnh
+            if (ImageFile != null && ImageFile.Length > 0)
+            {
+                var fileName = Guid.NewGuid().ToString() + Path.GetExtension(ImageFile.FileName);
+                var uploadPath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot/images/events");
+
+                if (!Directory.Exists(uploadPath))
+                    Directory.CreateDirectory(uploadPath);
+
+                var filePath = Path.Combine(uploadPath, fileName);
+
+                using (var stream = new FileStream(filePath, FileMode.Create))
+                {
+                    ImageFile.CopyTo(stream);
+                }
+
+                ev.ImageUrl = "/images/events/" + fileName;
+            }
+
             _eventService.CreateEvent(ev);
+
             return RedirectToAction(nameof(Index));
         }
+
         // UC-50: UPDATE
         public IActionResult Edit(int id)
         {
             if (!IsAdmin())
                 return RedirectToAction("Login", "Admin");
+
             var ev = _eventService.GetEventById(id);
             if (ev == null) return NotFound();
+
             return View(ev);
         }
+
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult Edit(Event ev)
+        public IActionResult Edit(Event ev, IFormFile? ImageFile)
         {
             if (!IsAdmin())
                 return RedirectToAction("Login", "Admin");
+
             if (!ModelState.IsValid)
                 return View(ev);
+
+            var existing = _eventService.GetEventById(ev.EventId);
+            if (existing == null)
+                return NotFound();
+
+            // upload ảnh mới
+            if (ImageFile != null && ImageFile.Length > 0)
+            {
+                var fileName = Guid.NewGuid().ToString() + Path.GetExtension(ImageFile.FileName);
+                var uploadPath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot/images/events");
+
+                if (!Directory.Exists(uploadPath))
+                    Directory.CreateDirectory(uploadPath);
+
+                var filePath = Path.Combine(uploadPath, fileName);
+
+                using (var stream = new FileStream(filePath, FileMode.Create))
+                {
+                    ImageFile.CopyTo(stream);
+                }
+
+                ev.ImageUrl = "/images/events/" + fileName;
+            }
+            else
+            {
+                ev.ImageUrl = existing.ImageUrl;
+            }
+
             if (!_eventService.UpdateEvent(ev))
                 return NotFound();
+
             return RedirectToAction(nameof(Index));
         }
+
         // UC-51: DELETE
         public IActionResult Delete(int id)
         {
             if (!IsAdmin())
                 return RedirectToAction("Login", "Admin");
+
             var ev = _eventService.GetEventById(id);
             if (ev == null) return NotFound();
+
             return View(ev);
         }
+
         [HttpPost]
         [ValidateAntiForgeryToken]
         public IActionResult DeleteConfirmed(int id)
         {
             if (!IsAdmin())
                 return RedirectToAction("Login", "Admin");
+
             _eventService.DeleteEvent(id);
+
             return RedirectToAction(nameof(Index));
         }
+
         // UC-54: JOIN EVENT (USER)
         public IActionResult Join(int id)
         {
@@ -129,7 +204,15 @@ namespace MotelLeAnh49.Controllers
                 return NotFound();
             }
 
-            var registration = _eventRegistrationService.Register(model.EventId, model.FullName, model.Email, model.Phone);
+            var registration = _eventRegistrationService.Register(
+                model.EventId,
+                model.FullName,
+                model.Email,
+                model.Phone
+            );
+
+            // lưu session
+            HttpContext.Session.SetInt32("RegisteredEvent_" + model.EventId, registration.Id);
 
             model.Title = ev.Title;
             model.EventDate = ev.EventDate;
@@ -139,20 +222,16 @@ namespace MotelLeAnh49.Controllers
             return View("JoinSuccess", model);
         }
 
-        // UC-55: CANCEL EVENT REGISTRATION (USER)
+        // UC-55: CANCEL EVENT REGISTRATION
         public IActionResult Cancel(int id)
         {
             var registration = _eventRegistrationService.GetById(id);
             if (registration == null)
-            {
                 return NotFound();
-            }
 
             var ev = _eventService.GetEventById(registration.EventId);
             if (ev == null)
-            {
                 return NotFound();
-            }
 
             var model = new JoinEventViewModel
             {
@@ -175,9 +254,10 @@ namespace MotelLeAnh49.Controllers
         public IActionResult CancelConfirmed(int id)
         {
             var success = _eventRegistrationService.Cancel(id);
+
             ViewBag.CancelSuccess = success;
+
             return View("CancelResult");
         }
     }
-
 }

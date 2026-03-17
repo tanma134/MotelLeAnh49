@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -42,8 +42,11 @@ namespace DataAccess.Repositories
                 throw new Exception("This Username is already taken!");
             }
 
+            // Check Email trùng
             if (_context.Accounts.Any(a => a.Email == account.Email))
+            {
                 throw new Exception("Email_Exists");
+            }
 
             _context.Accounts.Add(account);
         }
@@ -60,7 +63,6 @@ namespace DataAccess.Repositories
 
         public Account GetById(int id)
         {
-            // Tìm tài khoản theo Id, trả về null nếu không thấy
             return _context.Accounts.FirstOrDefault(a => a.Id == id);
         }
     }
