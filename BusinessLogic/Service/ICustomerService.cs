@@ -18,5 +18,7 @@ namespace BusinessLogic.Service
         void UpdateCustomer(Customer customer);
 
         void DeleteCustomer(int customerId);
+
+        IEnumerable<Customer> SearchByIdentity(string cccd);
     }
 }

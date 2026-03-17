@@ -1,6 +1,5 @@
-﻿using BusinessLogic.Service;
+using BusinessLogic.Service;
 using DataAccess.Models;
-
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.EntityFrameworkCore;
@@ -30,9 +29,20 @@ namespace MotelLeAnh49.Controllers
             base.OnActionExecuting(context);
         }
 
-        public IActionResult Index()
+        public IActionResult Index(string searchCCCD)
         {
-            var data = _customerService.GetAllCustomers();
+            IEnumerable<Customer> data;
+
+            if (!string.IsNullOrEmpty(searchCCCD))
+            {
+                data = _customerService.SearchByIdentity(searchCCCD);
+                ViewData["CurrentSearch"] = searchCCCD;
+            }
+            else
+            {
+                data = _customerService.GetAllCustomers();
+            }
+
             return View(data);
         }
 
@@ -42,19 +52,21 @@ namespace MotelLeAnh49.Controllers
         [ValidateAntiForgeryToken]
         public IActionResult Create(Account account, Customer customer)
         {
-            // 1. Xóa sạch mọi lỗi về validation của các object và email
-            ModelState.Clear(); // Cách mạnh tay nhất: Xóa sạch lỗi cũ để mình tự check bằng tay
+            ModelState.Clear();
 
-            // 2. Tự mình check những cái thực sự cần thiết
-            if (string.IsNullOrEmpty(account.Username) || string.IsNullOrEmpty(account.Password) || string.IsNullOrEmpty(customer.Email))
-            {
-                ModelState.AddModelError("", "Vui lòng nhập đầy đủ Username, Mật khẩu và Email!");
-                return View(customer);
-            }
+            if (string.IsNullOrEmpty(account.Username))
+                ModelState.AddModelError("Account.Username", "Username is required!");
+
+            if (string.IsNullOrEmpty(account.Password) || account.Password.Length < 6)
+                ModelState.AddModelError("Account.Password", "Password must be at least 6 characters!");
+
+            if (string.IsNullOrEmpty(customer.Email))
+                ModelState.AddModelError("Email", "Email is required!");
+
+            if (!ModelState.IsValid) return View(customer);
 
             try
             {
-                // 3. Logic xử lý như cũ
                 account.Email = customer.Email;
                 account.Password = _authService.HashPassword(account.Password);
                 account.Role = "Customer";
@@ -66,11 +78,32 @@ namespace MotelLeAnh49.Controllers
             }
             catch (Exception ex)
             {
-                ModelState.AddModelError("", "Lỗi hệ thống: " + ex.Message);
+                string msg = ex.Message;
+
+                if (msg.Contains("Phone"))
+                {
+                    ModelState.AddModelError("Phone", msg);
+                }
+                else if (msg.Contains("Identity"))
+                {
+                    ModelState.AddModelError("IdentityNumber", msg);
+                }
+                else if (msg.Contains("Username"))
+                {
+                    ModelState.AddModelError("Account.Username", msg);
+                }
+                else if (msg.Contains("Email"))
+                {
+                    ModelState.AddModelError("Email", "This email address has already been registered!");
+                }
+                else
+                {
+                    ModelState.AddModelError("", "System error: " + msg);
+                }
+
                 return View(customer);
             }
         }
-
 
         // GET: Customer/Edit/1
         public IActionResult Edit(int id)
@@ -78,7 +111,7 @@ namespace MotelLeAnh49.Controllers
             var customer = _customerService.GetCustomerById(id);
             if (customer == null)
             {
-                return NotFound(); // Trả về 404 nếu không tìm thấy ID này trong DB
+                return NotFound();
             }
             return View(customer);
         }
@@ -88,32 +121,38 @@ namespace MotelLeAnh49.Controllers
         [ValidateAntiForgeryToken]
         public IActionResult Edit(int id, Customer customer)
         {
-
-            ModelState.Remove("Account");
+            ModelState.Clear();
 
             if (id != customer.Id) return NotFound();
+
+            if (string.IsNullOrEmpty(customer.Phone))
+                ModelState.AddModelError("Phone", "Phone is require");
+
+            if (string.IsNullOrEmpty(customer.IdentityNumber))
+                ModelState.AddModelError("IdentityNumber", "IdentityNumber is require");
 
             if (ModelState.IsValid)
             {
                 try
                 {
                     _customerService.UpdateCustomer(customer);
-                    TempData["Success"] = "Cập nhật thông tin khách hàng thành công!";
+                    TempData["Success"] = "Cập nhật thành công!";
                     return RedirectToAction(nameof(Index));
                 }
                 catch (Exception ex)
                 {
-                    ModelState.AddModelError("", "Lỗi DB rồi bro: " + ex.Message);
+                    string msg = ex.Message;
+
+                    if (msg.Contains("Phone"))
+                        ModelState.AddModelError("Phone", "Phone Number exists");
+                    else if (msg.Contains("Identity"))
+                        ModelState.AddModelError("IdentityNumber", "Identity Number exists");
+                    else if (msg.Contains("Email"))
+                        ModelState.AddModelError("Email", "This email address has already been registered!");
+                    else
+                        ModelState.AddModelError("", "Lỗi hệ thống: " + msg);
                 }
             }
-
-            // --- ĐOẠN NÀY ĐỂ BẮT BỆNH ---
-            // Nếu nó chạy xuống đây, nghĩa là ModelState bị lỗi. 
-            // Ta lấy hết lỗi đó bỏ vào ViewBag để cái khung DEBUG ở UI nó hiện lên.
-            ViewBag.DebugErrors = ModelState.Values
-                .SelectMany(v => v.Errors)
-                .Select(e => e.ErrorMessage)
-                .ToList();
 
             return View(customer);
         }
@@ -121,7 +160,6 @@ namespace MotelLeAnh49.Controllers
         [HttpGet]
         public IActionResult Delete(int id)
         {
-            // 1. Tìm thông tin khách hàng để hiện lên trang xác nhận
             var customer = _customerService.GetCustomerById(id);
 
             if (customer == null)
@@ -132,27 +170,22 @@ namespace MotelLeAnh49.Controllers
             return View(customer);
         }
 
-        // POST: Customers/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public IActionResult DeleteConfirmed(int id)
         {
             try
             {
-                // 2. Gọi xuống Service để thực hiện logic "IsActive = false"
                 _customerService.DeleteCustomer(id);
 
-                // Thông báo thành công (nếu ba có dùng TempData)
                 TempData["Success"] = "Đã khóa tài khoản khách hàng thành công!";
 
                 return RedirectToAction(nameof(Index));
             }
             catch (Exception ex)
             {
-                // Nếu lỗi, quay lại trang xác nhận và hiện thông báo lỗi
                 ModelState.AddModelError("", "Lỗi khi thực hiện khóa: " + ex.Message);
 
-                // Cần lấy lại dữ liệu để hiển thị lại View
                 var customer = _customerService.GetCustomerById(id);
                 return View(customer);
             }

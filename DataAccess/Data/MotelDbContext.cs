@@ -27,6 +27,18 @@ namespace MotelLeAnh49.Data
         {
             base.OnModelCreating(modelBuilder);
 
+            modelBuilder.Entity<Customer>()
+            .HasIndex(c => c.Phone)
+            .IsUnique();
+
+            modelBuilder.Entity<Customer>()
+            .HasIndex(c => c.IdentityNumber)
+            .IsUnique();
+
+            modelBuilder.Entity<Account>()
+            .HasIndex(a => a.Username)
+            .IsUnique();
+
             // Admin
             modelBuilder.Entity<Admin>()
                 .HasIndex(a => a.Username)

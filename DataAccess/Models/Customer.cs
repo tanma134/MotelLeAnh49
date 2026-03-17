@@ -18,27 +18,30 @@ namespace DataAccess.Models
         [ForeignKey("Account")]
         public int AccountId { get; set; }
 
-        [Required]
-        [MaxLength(100)]
+        [Required(ErrorMessage = "Full Name is required")]
+        [MaxLength(100, ErrorMessage = "Full Name cannot exceed 100 characters")]
         public string FullName { get; set; }
 
-        [MaxLength(20)]
+        [Required(ErrorMessage = "Phone number is required")]
+        [MaxLength(20, ErrorMessage = "Phone number cannot exceed 20 characters")]
+        [Phone(ErrorMessage = "Invalid phone number format")]
         public string Phone { get; set; }
 
-        [MaxLength(200)]
+        [MaxLength(200, ErrorMessage = "Address cannot exceed 200 characters")]
         public string Address { get; set; }
 
-        [MaxLength(200)]
+        [MaxLength(200, ErrorMessage = "Email cannot exceed 200 characters")]
+        [EmailAddress(ErrorMessage = "Invalid email address format")]
         public string Email { get; set; }
 
-        [MaxLength(50)]
+        [Required(ErrorMessage = "Identity Number (ID/Passport) is required")]
+        [MaxLength(50, ErrorMessage = "Identity Number cannot exceed 50 characters")]
         public string IdentityNumber { get; set; }
 
-        // Navigation
+        // Navigation properties
         public Account Account { get; set; }
 
         public ICollection<Booking> Bookings { get; set; }
-
 
     }
 }

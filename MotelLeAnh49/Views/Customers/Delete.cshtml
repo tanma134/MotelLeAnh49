@@ -109,11 +109,40 @@
             background: #7f8c8d;
             transform: translateY(-2px);
         }
+
+
+    /* Style mới cho thông báo lỗi */
+    .alert-danger ul {
+        list-style: none;
+        margin: 0;
+        padding: 0;
+        display: inline;
+    }
+
+    .alert-danger li {
+        display: inline;
+    }
+
+    .alert-danger {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        font-weight: 500;
+        border-left: 5px solid #c0392b !important; /* Tạo điểm nhấn bên trái */
+    }
+
 </style>
 
 <div class="delete-container">
     <div class="warning-icon">🚫</div>
     <h2>Xác nhận khóa khách hàng</h2>
+    @if (!ViewData.ModelState.IsValid)
+    {
+        <div class="alert alert-danger" style="background-color: #f8d7da; color: #721c24; padding: 15px; border-radius: 8px; margin-bottom: 20px; border: 1px solid #f5c6cb; text-align: left;">
+            <span style="font-size: 20px;">⚠️</span>
+            <div asp-validation-summary="ModelOnly"></div>
+        </div>
+    }
 
     <div class="info-box">
         <p>
@@ -140,3 +169,4 @@
         </div>
     </form>
 </div>
+

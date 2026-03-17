@@ -19,6 +19,7 @@ namespace BusinessLogic.Service
             _repo = repo;
             _context = context;
         }
+
         public bool IsUsernameExist(string username)
         {
             return _repo.GetByUsername(username) != null;
@@ -28,6 +29,7 @@ namespace BusinessLogic.Service
         {
             return _repo.GetByEmail(email) != null;
         }
+
         public Account? Login(string username, string password)
         {
             var account = _repo.GetByUsername(username);
@@ -40,6 +42,7 @@ namespace BusinessLogic.Service
 
             return account;
         }
+
 
         public bool Register(Account account, Customer customer)
         {

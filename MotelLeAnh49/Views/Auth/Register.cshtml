@@ -245,12 +245,14 @@
             <p class="register-eyebrow">Get started</p>
             <h1 class="register-title">Create Account</h1>
         </div>
+
         @if (ViewBag.Error != null)
         {
             <div style="color:#e07070; margin-bottom:15px; font-size:14px;">
                 @ViewBag.Error
             </div>
         }
+
         <form asp-action="Register" method="post">
 
             <!-- Account Info -->

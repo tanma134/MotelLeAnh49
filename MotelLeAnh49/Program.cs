@@ -27,8 +27,6 @@ builder.Services.AddScoped<IChatRepository, ChatRepository>();
 builder.Services.AddScoped<IEventRepository, EventRepository>();
 builder.Services.AddScoped<IEventRegistrationRepository, EventRegistrationRepository>();
 
-
-
 // Services
 builder.Services.AddScoped<IRoomService, RoomService>();
 builder.Services.AddScoped<IAdminService, AdminService>();
@@ -36,6 +34,8 @@ builder.Services.AddScoped<ICustomerService, CustomerService>();
 builder.Services.AddScoped<IBookingService, BookingService>();
 builder.Services.AddScoped<EmailService>();
 builder.Services.AddScoped<AuthService>();
+
+
 builder.Services.Configure<OpenAIConfig>(
     builder.Configuration.GetSection("OpenAI"));
 builder.Services.AddHttpClient<IOpenAIService, OpenAIService>(client =>
@@ -106,6 +106,7 @@ builder.Services.AddAuthorization(options =>
 // ================== MVC ==================
 
 builder.Services.AddControllersWithViews();
+
 builder.Services.AddSignalR();
 
 var app = builder.Build();

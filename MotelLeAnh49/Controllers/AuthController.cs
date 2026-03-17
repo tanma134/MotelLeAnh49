@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc;
 using BusinessLogic.Service;
 using DataAccess.Models;
 
@@ -35,6 +35,7 @@ namespace MotelLeAnh49.Controllers
 
             if (!account.IsActive)
                 return null;
+
             // Lưu session
             HttpContext.Session.SetString("Username", account.Username);
             HttpContext.Session.SetString("Role", account.Role);
@@ -146,10 +147,12 @@ namespace MotelLeAnh49.Controllers
 
             return RedirectToAction("Login");
         }
+
         public IActionResult ForgotPassword()
         {
             return View();
         }
+
         [HttpPost]
         public IActionResult ForgotPassword(string email)
         {
@@ -170,6 +173,7 @@ namespace MotelLeAnh49.Controllers
 
             return RedirectToAction("VerifyResetOTP");
         }
+
         public IActionResult VerifyResetOTP()
         {
             return View();
@@ -188,6 +192,7 @@ namespace MotelLeAnh49.Controllers
 
             return RedirectToAction("ResetPassword");
         }
+
         public IActionResult ResetPassword()
         {
             return View();

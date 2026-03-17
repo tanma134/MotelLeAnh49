@@ -1,3 +1,4 @@
+
 using Microsoft.EntityFrameworkCore;
 using MotelLeAnh49.Data;
 using MotelLeAnh49.Models;
@@ -48,5 +49,6 @@ namespace DataAccess.Repositories
                 .OrderBy(e => e.EventDate)
                 .ToListAsync();
         }
+
     }
 }

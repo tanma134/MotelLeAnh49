@@ -10,5 +10,6 @@ namespace DataAccess.Repositories
         void Update(Event ev);
         void Delete(int id);
         Task<List<Event>> GetUpcomingEventsAsync();
+
     }
 }
