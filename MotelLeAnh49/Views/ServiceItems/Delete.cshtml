@@ -1,36 +1,111 @@
 @model MotelLeAnh49.Models.ServiceItem
 
 @{
-    ViewData["Title"] = "Xóa dịch vụ";
-    Layout = "_AdminLayout";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
 }
 
-<div class="container-fluid px-4">
-    <h1 class="mt-4">Xóa dịch vụ</h1>
-    <div class="card mb-4 mt-3 col-md-6 border-danger">
-        <div class="card-header bg-danger text-white">
-            <h5 class="mb-0">Xác nhận xóa dịch vụ</h5>
+<style>
+    body {
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        background: #f5f7fa;
+        margin: 0;
+        padding: 20px;
+    }
+
+    .delete-container {
+        max-width: 500px;
+        margin: 100px auto;
+        background: white;
+        padding: 40px;
+        border-radius: 12px;
+        box-shadow: 0 2px 15px rgba(0,0,0,0.1);
+        text-align: center;
+    }
+
+    h2 {
+        color: #e74c3c;
+        margin-bottom: 20px;
+        font-size: 28px;
+    }
+
+    .warning-icon {
+        font-size: 60px;
+        color: #e74c3c;
+        margin-bottom: 20px;
+    }
+
+    p {
+        color: #555;
+        font-size: 16px;
+        margin-bottom: 30px;
+    }
+
+        p b {
+            color: #2c3e50;
+            font-size: 18px;
+        }
+
+    .button-group {
+        display: flex;
+        gap: 15px;
+        justify-content: center;
+    }
+
+    button {
+        padding: 14px 30px;
+        background: #e74c3c;
+        color: white;
+        border: none;
+        border-radius: 8px;
+        font-size: 16px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+
+        button:hover {
+            background: #c0392b;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(231, 76, 60, 0.4);
+        }
+
+    .btn-cancel {
+        padding: 14px 30px;
+        background: #95a5a6;
+        color: white;
+        text-decoration: none;
+        border-radius: 8px;
+        font-size: 16px;
+        font-weight: 600;
+        transition: all 0.3s ease;
+        display: inline-block;
+    }
+
+        .btn-cancel:hover {
+            background: #7f8c8d;
+            transform: translateY(-2px);
+        }
+</style>
+
+<div class="delete-container">
+    <div class="warning-icon">⚠️</div>
+
+    <h2>Xác nhận xoá dịch vụ</h2>
+
+    <p>
+        Bạn có chắc chắn muốn xoá dịch vụ
+        <b>@Model.Name</b> không?<br />
+        Hành động này không thể hoàn tác!
+    </p>
+
+    <form method="post">
+        @Html.AntiForgeryToken()
+
+        <input type="hidden" asp-for="ServiceItemId" />
+
+        <div class="button-group">
+            <button type="submit">🗑️ Xác nhận xoá</button>
+            <a asp-action="Index" class="btn-cancel">❌ Huỷ bỏ</a>
         </div>
-        <div class="card-body">
-            <p class="lead">Bạn có chắc chắn muốn xóa dịch vụ này không?</p>
-            <dl class="row">
-                <dt class="col-sm-4">Tên dịch vụ</dt>
-                <dd class="col-sm-8">@Model.Name</dd>
-                
-                <dt class="col-sm-4">Mô tả</dt>
-                <dd class="col-sm-8">@Model.Description</dd>
-                
-                <dt class="col-sm-4">Giá (VNĐ)</dt>
-                <dd class="col-sm-8">@Model.Price.ToString("N0")</dd>
-            </dl>
-            
-            <form asp-action="Delete">
-                <input type="hidden" asp-for="ServiceItemId" />
-                <div class="d-grid gap-2 d-md-flex justify-content-md-end">
-                    <a asp-action="Index" class="btn btn-secondary me-md-2">Hủy bỏ</a>
-                    <button type="submit" class="btn btn-danger">Xác nhận xóa</button>
-                </div>
-            </form>
-        </div>
-    </div>
+    </form>
 </div>

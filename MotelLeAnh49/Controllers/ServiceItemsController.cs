@@ -28,13 +28,34 @@ namespace MotelLeAnh49.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult Create(ServiceItem serviceItem)
+        public async Task<IActionResult> Create(ServiceItem serviceItem, IFormFile ImageFile)
         {
             if (ModelState.IsValid)
             {
+                if (ImageFile != null && ImageFile.Length > 0)
+                {
+                    var folderPath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot/images/services");
+
+                    if (!Directory.Exists(folderPath))
+                    {
+                        Directory.CreateDirectory(folderPath);
+                    }
+
+                    var fileName = Guid.NewGuid().ToString() + Path.GetExtension(ImageFile.FileName);
+                    var filePath = Path.Combine(folderPath, fileName);
+
+                    using (var stream = new FileStream(filePath, FileMode.Create))
+                    {
+                        await ImageFile.CopyToAsync(stream);
+                    }
+
+                    serviceItem.ImageUrl = "/images/services/" + fileName;
+                }
+
                 _serviceItemService.CreateService(serviceItem);
                 return RedirectToAction(nameof(Index));
             }
+
             return View(serviceItem);
         }
 
@@ -48,13 +69,34 @@ namespace MotelLeAnh49.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult Edit(ServiceItem serviceItem)
+        public async Task<IActionResult> Edit(ServiceItem serviceItem, IFormFile ImageFile)
         {
             if (ModelState.IsValid)
             {
+                if (ImageFile != null && ImageFile.Length > 0)
+                {
+                    var folderPath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot/images/services");
+
+                    if (!Directory.Exists(folderPath))
+                    {
+                        Directory.CreateDirectory(folderPath);
+                    }
+
+                    var fileName = Guid.NewGuid().ToString() + Path.GetExtension(ImageFile.FileName);
+                    var filePath = Path.Combine(folderPath, fileName);
+
+                    using (var stream = new FileStream(filePath, FileMode.Create))
+                    {
+                        await ImageFile.CopyToAsync(stream);
+                    }
+
+                    serviceItem.ImageUrl = "/images/services/" + fileName;
+                }
+
                 _serviceItemService.UpdateService(serviceItem);
                 return RedirectToAction(nameof(Index));
             }
+
             return View(serviceItem);
         }
 
