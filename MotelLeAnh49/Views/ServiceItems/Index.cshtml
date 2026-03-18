@@ -1,0 +1,183 @@
+@model IEnumerable<MotelLeAnh49.Models.ServiceItem>
+
+@{
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+
+<style>
+    body {
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        background: #f5f7fa;
+        margin: 0;
+    }
+
+    h2 {
+        color: #2c3e50;
+        margin-bottom: 20px;
+        font-size: 28px;
+        border-bottom: 3px solid #3498db;
+        padding-bottom: 10px;
+        display: inline-block;
+    }
+
+    .btn-add {
+        display: inline-block;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 12px 24px;
+        border-radius: 8px;
+        text-decoration: none;
+        margin-bottom: 20px;
+        transition: all 0.3s ease;
+        font-weight: 600;
+    }
+
+        .btn-add:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 20px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        border-radius: 8px;
+        overflow: hidden;
+    }
+
+    thead {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+    }
+
+    th {
+        padding: 15px 10px;
+        text-align: center;
+        font-weight: 600;
+        font-size: 14px;
+        letter-spacing: 0.5px;
+    }
+
+    tbody tr {
+        border-bottom: 1px solid #e0e0e0;
+        transition: background 0.2s ease;
+    }
+
+        tbody tr:hover {
+            background: #f8f9fa;
+        }
+
+        tbody tr:nth-child(even) {
+            background: #fafbfc;
+        }
+
+    td {
+        padding: 14px 10px;
+        text-align: center;
+        color: #555;
+    }
+
+        td b {
+            color: #2c3e50;
+            font-size: 16px;
+        }
+
+    .action-link {
+        color: #3498db;
+        text-decoration: none;
+        padding: 6px 12px;
+        border-radius: 4px;
+        transition: all 0.2s ease;
+        display: inline-block;
+        font-size: 13px;
+    }
+
+        .action-link:hover {
+            background: #3498db;
+            color: white;
+        }
+
+    .delete-link {
+        color: #e74c3c;
+    }
+
+        .delete-link:hover {
+            background: #e74c3c;
+            color: white;
+        }
+
+    .price {
+        color: #27ae60;
+        font-weight: 600;
+    }
+
+    .status-active {
+        color: #27ae60;
+        font-weight: 600;
+    }
+
+    .status-inactive {
+        color: #e74c3c;
+        font-weight: 600;
+    }
+</style>
+
+<div class="container">
+    <h2>🛎️ QUẢN LÝ DỊCH VỤ</h2>
+
+    <p>
+        <a asp-action="Create" class="btn-add">➕ Thêm dịch vụ</a>
+    </p>
+
+    <table>
+        <thead>
+            <tr>
+                <th>STT</th>
+                <th>Tên dịch vụ</th>
+                <th>Mô tả</th>
+                <th>Giá</th>
+                <th>Trạng thái</th>
+                <th>Hành động</th>
+            </tr>
+        </thead>
+
+        <tbody>
+            @{
+                int stt = 1;
+            }
+
+            @foreach (var item in Model)
+            {
+                <tr>
+                    <td>@stt</td>
+                    <td><b>@item.Name</b></td>
+                    <td>@item.Description</td>
+                    <td class="price">@item.Price.ToString("N0") đ</td>
+
+                    <td>
+                        @if (item.IsAvailable)
+                        {
+                            <span class="status-active">✔ Đang kinh doanh</span>
+                        }
+                        else
+                        {
+                            <span class="status-inactive">✖ Ngừng cung cấp</span>
+                        }
+                    </td>
+
+                    <td>
+                        <a asp-action="Edit" asp-route-id="@item.ServiceItemId" class="action-link">✏️ Sửa</a>
+                        <a asp-action="Delete" asp-route-id="@item.ServiceItemId"
+                           class="action-link delete-link"
+                           onclick="return confirm('Bạn có chắc muốn xoá dịch vụ này?')">
+                            🗑️ Xoá
+                        </a>
+                    </td>
+                </tr>
+
+                stt++;
+            }
+        </tbody>
+    </table>
+</div>

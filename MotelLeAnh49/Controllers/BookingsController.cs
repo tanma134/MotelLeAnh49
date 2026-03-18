@@ -3,6 +3,7 @@ using BusinessLogic.Service;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using MotelLeAnh49.Models;
+using DataAccess.Models;
 
 namespace MotelLeAnh49.Controllers
 {
@@ -11,15 +12,51 @@ namespace MotelLeAnh49.Controllers
         private readonly IBookingService _bookingService;
         private readonly IRoomService _roomService;
         private readonly EmailService _emailService;
+        private readonly IServiceItemService _serviceItemService;
 
         public BookingsController(
             IBookingService bookingService,
             IRoomService roomService,
-            EmailService emailService)
+            EmailService emailService,
+            IServiceItemService serviceItemService)
         {
             _bookingService = bookingService;
             _roomService = roomService;
             _emailService = emailService;
+            _serviceItemService = serviceItemService;
+        }
+
+        // ==============================
+        // ADMIN BOOKING DETAILS & SERVICES
+        // ==============================
+        public IActionResult Details(int id)
+        {
+            if (HttpContext.Session.GetString("Role") != "Admin")
+            {
+                return RedirectToAction("Login", "Admin");
+            }
+
+            var booking = _bookingService.GetById(id);
+            if (booking == null) return NotFound();
+
+            // Load room info if not loaded
+            if (booking.Room == null)
+            {
+                booking.Room = _roomService.GetRoomById(booking.RoomId);
+            }
+
+            // Get services used in this booking
+            var usedServices = _serviceItemService.GetServicesByBooking(id);
+            ViewBag.UsedServices = usedServices;
+            ViewBag.TotalServiceCost = _serviceItemService.CalculateTotalServiceCost(id);
+
+            // Get all available services to add
+            ViewBag.AvailableServices = _serviceItemService.GetAllServices()
+                .Where(s => s.IsAvailable)
+                .Select(s => new SelectListItem { Value = s.ServiceItemId.ToString(), Text = $"{s.Name} - {s.Price:N0} VNĐ" })
+                .ToList();
+
+            return View(booking);
         }
 
         // ==============================

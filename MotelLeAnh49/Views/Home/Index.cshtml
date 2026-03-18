@@ -336,65 +336,70 @@
         </div>
 
         <div class="row">
-            <div class="col-lg-3 col-md-6 mb-4">
-                <div class="service-card">
-                    <div style="overflow: hidden;">
-                        <img src="https://images.unsplash.com/photo-1556912173-46c336c7fd55?w=600&h=400&fit=crop" alt="WiFi">
-                    </div>
-                    <div class="card-body">
-                        <div class="service-icon">
-                            <i class="fas fa-wifi"></i>
-                        </div>
-                        <h4>WiFi tốc độ cao</h4>
-                        <p>Kết nối Internet tốc độ cao miễn phí trong toàn bộ khu vực</p>
-                    </div>
-                </div>
-            </div>
+            @{
+                var services = ViewBag.Services as IEnumerable<MotelLeAnh49.Models.ServiceItem>;
+            }
 
-            <div class="col-lg-3 col-md-6 mb-4">
-                <div class="service-card">
-                    <div style="overflow: hidden;">
-                        <img src="https://images.unsplash.com/photo-1590846406792-0adc7f938f1d?w=600&h=400&fit=crop" alt="Parking">
-                    </div>
-                    <div class="card-body">
-                        <div class="service-icon">
-                            <i class="fas fa-parking"></i>
-                        </div>
-                        <h4>Bãi đỗ xe</h4>
-                        <p>Bãi đỗ xe rộng rãi, an toàn với camera giám sát 24/7</p>
-                    </div>
-                </div>
-            </div>
+            @if (services != null && services.Any())
+            {
+                @foreach (var s in services)
+                {
+                    <div class="col-lg-3 col-md-6 mb-4">
+                        <div class="service-card">
 
-            <div class="col-lg-3 col-md-6 mb-4">
-                <div class="service-card">
-                    <div style="overflow: hidden;">
-                        <img src="https://images.unsplash.com/photo-1559339352-11d035aa65de?w=600&h=400&fit=crop" alt="Laundry">
-                    </div>
-                    <div class="card-body">
-                        <div class="service-icon">
-                            <i class="fas fa-tshirt"></i>
-                        </div>
-                        <h4>Giặt ủi</h4>
-                        <p>Dịch vụ giặt ủi chuyên nghiệp, nhanh chóng và tiện lợi</p>
-                    </div>
-                </div>
-            </div>
+                            <div style="overflow: hidden;">
+                                <img src="@(string.IsNullOrEmpty(s.ImageUrl)
+                                            ? "https://via.placeholder.com/600x400"
+                                            : s.ImageUrl)"
+                                     alt="@s.Name"
+                                     style="width:100%; height:200px; object-fit:cover;">
+                            </div>
 
-            <div class="col-lg-3 col-md-6 mb-4">
-                <div class="service-card">
-                    <div style="overflow: hidden;">
-                        <img src="https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?w=600&h=400&fit=crop" alt="Room Service">
-                    </div>
-                    <div class="card-body">
-                        <div class="service-icon">
-                            <i class="fas fa-concierge-bell"></i>
+                            <div class="card-body">
+                                <div class="service-icon">
+                                    @{
+                                        string icon = "bi bi-arrow-through-heart";
+
+                                        if (s.Name.ToLower().Contains("wifi")) icon = "bi bi-wifi";
+                                        else if (s.Name.ToLower().Contains("giặt")) icon = "bi bi-basket";
+                                        else if (s.Name.ToLower().Contains("hồ")) icon = "bi bi-water";
+                           
+                                    }
+                                    <i class="@icon"></i>
+                                </div>
+
+                                <h4>@s.Name</h4>
+
+                                <p>
+                                    @(string.IsNullOrEmpty(s.Description)
+                                        ? "Dịch vụ chất lượng cao tại motel"
+                                        : s.Description)
+                                </p>
+
+                                <p style="color:#e67e22; font-weight:600;">
+                                    @if (s.Price <= 0)
+                                    {
+                                        <span style="color:#27ae60; font-weight:600;">Miễn phí</span>
+                                    }
+                                    else
+                                    {
+                                        <span style="color:#e67e22; font-weight:600;">
+                                            @s.Price.ToString("N0") đ
+                                        </span>
+                                    }
+                                </p>
+                            </div>
+
                         </div>
-                        <h4>Phục vụ phòng</h4>
-                        <p>Đội ngũ phục vụ tận tâm, sẵn sàng hỗ trợ 24/7</p>
                     </div>
+                }
+            }
+            else
+            {
+                <div class="col-12 text-center">
+                    <p>Hiện chưa có dịch vụ nào.</p>
                 </div>
-            </div>
+            }
         </div>
     </div>
 </section>

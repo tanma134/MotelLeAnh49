@@ -31,7 +31,13 @@ namespace MotelLeAnh49.Controllers
                 .Take(5)
                 .ToList();
 
+            var services = _context.ServiceItems
+        .Where(s => s.IsAvailable)
+        .OrderBy(s => s.Name)
+        .ToList();
+
             ViewBag.Events = events;
+            ViewBag.Services = services;
 
             return View(rooms);
         }
