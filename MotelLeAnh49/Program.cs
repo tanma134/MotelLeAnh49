@@ -26,12 +26,15 @@ builder.Services.AddScoped<IBookingRepository, BookingRepository>();
 builder.Services.AddScoped<IChatRepository, ChatRepository>();
 builder.Services.AddScoped<IEventRepository, EventRepository>();
 builder.Services.AddScoped<IEventRegistrationRepository, EventRegistrationRepository>();
+builder.Services.AddScoped<IServiceItemRepository, ServiceItemRepository>();
+builder.Services.AddScoped<IBookingServiceRepository, BookingServiceRepository>();
 
 // Services
 builder.Services.AddScoped<IRoomService, RoomService>();
 builder.Services.AddScoped<IAdminService, AdminService>();
 builder.Services.AddScoped<ICustomerService, CustomerService>();
 builder.Services.AddScoped<IBookingService, BookingService>();
+builder.Services.AddScoped<IServiceItemService, ServiceItemService>();
 builder.Services.AddScoped<EmailService>();
 builder.Services.AddScoped<AuthService>();
 
@@ -45,10 +48,6 @@ builder.Services.AddHttpClient<IOpenAIService, OpenAIService>(client =>
     client.DefaultRequestHeaders.Add("anthropic-version", "2023-06-01");
 });
 builder.Services.AddScoped<IChatService, ChatService>();
-// Email config
-builder.Services.Configure<EmailSettings>(
-    builder.Configuration.GetSection("EmailSettings"));
-
 
 builder.Services.AddScoped<IEventService, EventService>();
 builder.Services.AddScoped<IEventRegistrationService, EventRegistrationService>();
@@ -82,7 +81,7 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
     // redirect đúng login page
     options.Events.OnRedirectToLogin = context =>
     {
-        if (context.Request.Path.StartsWithSegments("/Bookings"))
+        if (context.Request.Path.StartsWithSegments("/Bookings") || context.Request.Path.StartsWithSegments("/Admin"))
         {
             context.Response.Redirect("/Admin/Login");
         }

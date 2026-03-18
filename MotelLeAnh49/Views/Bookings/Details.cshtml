@@ -1,0 +1,156 @@
+@model MotelLeAnh49.Models.Booking
+@using DataAccess.Models
+
+@{
+    ViewData["Title"] = "Chi tiết đặt phòng";
+    Layout = "_AdminLayout";
+    var usedServices = ViewBag.UsedServices as List<BookingServiceItem>;
+    var totalServiceCost = (decimal)ViewBag.TotalServiceCost;
+    
+    // Tính tiền phòng cơ bản (giả sử tính theo ngày)
+    var days = (Model.CheckOut - Model.CheckIn).Days;
+    if (days <= 0) days = 1;
+    var roomPrice = Model.Room?.OvernightPrice ?? 0;
+    var totalRoomCost = roomPrice * days;
+    
+    var finalTotal = totalRoomCost + totalServiceCost;
+}
+
+<div class="container-fluid px-4">
+    <div class="row">
+        <!-- Thông tin đặt phòng -->
+        <div class="col-lg-6">
+            <div class="card mb-4">
+                <div class="card-header bg-primary text-white">
+                    <i class="fas fa-info-circle me-1"></i> Thông tin khách hàng
+                </div>
+                <div class="card-body">
+                    <table class="table table-borderless">
+                        <tr>
+                            <th width="150">Khách hàng:</th>
+                            <td><strong>@Model.FullName</strong></td>
+                        </tr>
+                        <tr>
+                            <th>Số điện thoại:</th>
+                            <td>@Model.Phone</td>
+                        </tr>
+                        <tr>
+                            <th>Phòng:</th>
+                            <td><span class="badge bg-info text-dark">Phòng @Model.Room?.RoomNumber</span></td>
+                        </tr>
+                        <tr>
+                            <th>Nhận phòng:</th>
+                            <td>@Model.CheckIn.ToString("dd/MM/yyyy HH:mm")</td>
+                        </tr>
+                        <tr>
+                            <th>Trả phòng:</th>
+                            <td>@Model.CheckOut.ToString("dd/MM/yyyy HH:mm")</td>
+                        </tr>
+                        <tr>
+                            <th>Trạng thái:</th>
+                            <td>
+                                @if (Model.Status == "Confirmed") { <span class="badge bg-success">Đã xác nhận</span> }
+                                else if (Model.Status == "Pending") { <span class="badge bg-warning text-dark">Chờ duyệt</span> }
+                                else { <span class="badge bg-secondary">@Model.Status</span> }
+                            </td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Quản lý dịch vụ -->
+        <div class="col-lg-6">
+            <div class="card mb-4">
+                <div class="card-header bg-success text-white">
+                    <i class="fas fa-concierge-bell me-1"></i> Dịch vụ sử dụng
+                </div>
+                <div class="card-body">
+                    <!-- Form thêm dịch vụ -->
+                    <form asp-controller="ServiceItems" asp-action="AddToBooking" method="post" class="row g-2 mb-3">
+                        <input type="hidden" name="bookingId" value="@Model.Id" />
+                        <div class="col-7">
+                            <select name="serviceItemId" class="form-select" asp-items="ViewBag.AvailableServices">
+                                <option value="">-- Chọn dịch vụ --</option>
+                            </select>
+                        </div>
+                        <div class="col-3">
+                            <input type="number" name="quantity" class="form-control" value="1" min="1" />
+                        </div>
+                        <div class="col-2">
+                            <button type="submit" class="btn btn-success w-100"><i class="fas fa-plus"></i></button>
+                        </div>
+                    </form>
+
+                    <table class="table table-sm">
+                        <thead>
+                            <tr>
+                                <th>Dịch vụ</th>
+                                <th>SL</th>
+                                <th>Giá</th>
+                                <th class="text-end">Thành tiền</th>
+                                <th></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @if (usedServices != null && usedServices.Any())
+                            {
+                                foreach (var item in usedServices)
+                                {
+                                    <tr>
+                                        <td>@item.ServiceItem?.Name</td>
+                                        <td>@item.Quantity</td>
+                                        <td>@item.PriceAtBooking.ToString("N0")</td>
+                                        <td class="text-end">@((item.PriceAtBooking * item.Quantity).ToString("N0"))</td>
+                                        <td class="text-end">
+                                            <form asp-controller="ServiceItems" asp-action="RemoveFromBooking" method="post" style="display:inline;">
+                                                <input type="hidden" name="id" value="@item.Id" />
+                                                <input type="hidden" name="bookingId" value="@Model.Id" />
+                                                <button type="submit" class="btn btn-link text-danger p-0"><i class="fas fa-times"></i></button>
+                                            </form>
+                                        </td>
+                                    </tr>
+                                }
+                            }
+                            else
+                            {
+                                <tr>
+                                    <td colspan="5" class="text-center text-muted">Chưa sử dụng dịch vụ</td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tổng hợp hóa đơn -->
+        <div class="col-12">
+            <div class="card mb-4 border-primary">
+                <div class="card-body bg-light">
+                    <div class="row text-center">
+                        <div class="col-md-4">
+                            <h5 class="text-muted">Tiền phòng (@days ngày)</h5>
+                            <h3 class="text-primary">@totalRoomCost.ToString("N0") VNĐ</h3>
+                        </div>
+                        <div class="col-md-4">
+                            <h5 class="text-muted">Tiền dịch vụ</h5>
+                            <h3 class="text-success">@totalServiceCost.ToString("N0") VNĐ</h3>
+                        </div>
+                        <div class="col-md-4">
+                            <h5 class="text-dark font-weight-bold">TỔNG THANH TOÁN</h5>
+                            <h2 class="text-danger font-weight-bold">@finalTotal.ToString("N0") VNĐ</h2>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-footer d-flex justify-content-between">
+                    <a asp-action="Index" class="btn btn-secondary">Quay lại danh sách</a>
+                    <div>
+                        <button class="btn btn-info me-2" onclick="window.print()"><i class="fas fa-print"></i> In hóa đơn</button>
+                        <a asp-action="UpdateStatus" asp-route-id="@Model.Id" class="btn btn-warning">Cập nhật trạng thái</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

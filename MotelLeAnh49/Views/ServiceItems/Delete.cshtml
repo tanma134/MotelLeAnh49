@@ -1,0 +1,36 @@
+@model MotelLeAnh49.Models.ServiceItem
+
+@{
+    ViewData["Title"] = "Xóa dịch vụ";
+    Layout = "_AdminLayout";
+}
+
+<div class="container-fluid px-4">
+    <h1 class="mt-4">Xóa dịch vụ</h1>
+    <div class="card mb-4 mt-3 col-md-6 border-danger">
+        <div class="card-header bg-danger text-white">
+            <h5 class="mb-0">Xác nhận xóa dịch vụ</h5>
+        </div>
+        <div class="card-body">
+            <p class="lead">Bạn có chắc chắn muốn xóa dịch vụ này không?</p>
+            <dl class="row">
+                <dt class="col-sm-4">Tên dịch vụ</dt>
+                <dd class="col-sm-8">@Model.Name</dd>
+                
+                <dt class="col-sm-4">Mô tả</dt>
+                <dd class="col-sm-8">@Model.Description</dd>
+                
+                <dt class="col-sm-4">Giá (VNĐ)</dt>
+                <dd class="col-sm-8">@Model.Price.ToString("N0")</dd>
+            </dl>
+            
+            <form asp-action="Delete">
+                <input type="hidden" asp-for="ServiceItemId" />
+                <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                    <a asp-action="Index" class="btn btn-secondary me-md-2">Hủy bỏ</a>
+                    <button type="submit" class="btn btn-danger">Xác nhận xóa</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
