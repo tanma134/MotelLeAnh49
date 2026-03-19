@@ -90,5 +90,9 @@ namespace DataAccess.Repositories
         {
             _context.Customers.Remove(customer);
         }
+        public async Task<Customer> GetByIdAsync(int id)
+        {
+            return await _context.Customers.FindAsync(id);
+        }
     }
 }

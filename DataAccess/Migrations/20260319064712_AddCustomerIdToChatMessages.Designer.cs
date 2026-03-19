@@ -12,8 +12,8 @@ using MotelLeAnh49.Data;
 namespace DataAccess.Migrations
 {
     [DbContext(typeof(MotelDbContext))]
-    [Migration("20260317072931_InitialCreate")]
-    partial class InitialCreate
+    [Migration("20260319064712_AddCustomerIdToChatMessages")]
+    partial class AddCustomerIdToChatMessages
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -64,6 +64,38 @@ namespace DataAccess.Migrations
                     b.ToTable("Accounts");
                 });
 
+            modelBuilder.Entity("DataAccess.Models.BookingServiceItem", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("BookingId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<decimal>("PriceAtBooking")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<int>("Quantity")
+                        .HasColumnType("int");
+
+                    b.Property<int>("ServiceItemId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("BookingId");
+
+                    b.HasIndex("ServiceItemId");
+
+                    b.ToTable("BookingServiceItems");
+                });
+
             modelBuilder.Entity("DataAccess.Models.ChatMessage", b =>
                 {
                     b.Property<int>("Id")
@@ -78,6 +110,9 @@ namespace DataAccess.Migrations
 
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
+
+                    b.Property<int?>("CustomerId")
+                        .HasColumnType("int");
 
                     b.Property<string>("UserMessage")
                         .IsRequired()
@@ -423,6 +458,25 @@ namespace DataAccess.Migrations
                     b.HasKey("ServiceItemId");
 
                     b.ToTable("ServiceItems");
+                });
+
+            modelBuilder.Entity("DataAccess.Models.BookingServiceItem", b =>
+                {
+                    b.HasOne("MotelLeAnh49.Models.Booking", "Booking")
+                        .WithMany()
+                        .HasForeignKey("BookingId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("MotelLeAnh49.Models.ServiceItem", "ServiceItem")
+                        .WithMany()
+                        .HasForeignKey("ServiceItemId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Booking");
+
+                    b.Navigation("ServiceItem");
                 });
 
             modelBuilder.Entity("DataAccess.Models.Customer", b =>

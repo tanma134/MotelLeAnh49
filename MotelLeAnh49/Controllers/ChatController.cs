@@ -1,7 +1,7 @@
 ﻿// MotelLeAnh49/Controllers/ChatController.cs
 using BusinessLogic.Service;
 using Microsoft.AspNetCore.Mvc;
-
+using MotelLeAnh49.Helpers;
 namespace MotelLeAnh49.Controllers
 {
     public class ChatController : Controller
@@ -27,7 +27,24 @@ namespace MotelLeAnh49.Controllers
             if (string.IsNullOrWhiteSpace(request?.Message))
                 return BadRequest(new { error = "Message cannot be empty." });
 
-            var aiResponse = await _chatService.ProcessUserMessageAsync(request.Message);
+            // 🔥 Lấy CustomerId từ Session
+            int? customerId = HttpContext.Session.GetInt32("CustomerId");
+
+            // convert sang string (vì ChatService đang dùng string)
+            string? userId = customerId?.ToString();
+
+            var aiResponse = await _chatService.ProcessUserMessageAsync(request.Message, customerId);
+
+            // 🔥 Nếu là guest → lưu session
+            if (customerId == null)
+            {
+                var history = HttpContext.Session.GetObject<List<string>>("ChatHistory") ?? new();
+
+                history.Add("User: " + request.Message);
+                history.Add("AI: " + aiResponse);
+
+                HttpContext.Session.SetObject("ChatHistory", history);
+            }
 
             return Ok(new { response = aiResponse });
         }

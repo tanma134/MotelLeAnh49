@@ -22,5 +22,6 @@ namespace DataAccess.Repositories
 
         IEnumerable<Customer> SearchByIdentity(string cccd);
 
+        Task<Customer> GetByIdAsync(int id);
     }
 }

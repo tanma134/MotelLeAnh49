@@ -18,28 +18,24 @@ namespace DataAccess.Repositories
         {
             _context = context;
         }
-
-        // Step 7: SaveChat — called by ChatService
-        public async Task SaveChatAsync(string userMessage, string aiResponse)
+       
+        public async Task SaveChatAsync(int? customerId, string userMessage, string aiResponse)
         {
             var chat = new ChatMessage
             {
+                CustomerId = customerId,
                 UserMessage = userMessage,
                 AiResponse = aiResponse,
                 CreatedAt = DateTime.UtcNow
             };
 
             _context.ChatMessages.Add(chat);
-
-            // Step 8: ChatRepository → MotelDbContext.SaveChanges()
-            // Step 9: MotelDbContext → Database (INSERT)
-            // Step 10–12: DB confirms → MotelDbContext → ChatRepository → ChatService
             await _context.SaveChangesAsync();
         }
-
-        public async Task<IEnumerable<ChatMessage>> GetHistoryAsync(int limit = 50)
+        public async Task<IEnumerable<ChatMessage>> GetHistoryByCustomerIdAsync(int customerId, int limit = 5)
         {
             return await _context.ChatMessages
+                .Where(c => c.CustomerId == customerId)
                 .OrderByDescending(c => c.CreatedAt)
                 .Take(limit)
                 .OrderBy(c => c.CreatedAt)

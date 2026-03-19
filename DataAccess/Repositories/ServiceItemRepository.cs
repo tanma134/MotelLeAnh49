@@ -44,5 +44,11 @@ namespace DataAccess.Repositories
                 _context.SaveChanges();
             }
         }
+        public async Task < List < ServiceItem >> GetAvailableServicesAsync()
+{
+    return await _context.ServiceItems
+        .Where(s => s.IsAvailable)
+        .ToListAsync();
     }
+}
 }

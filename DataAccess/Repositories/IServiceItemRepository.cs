@@ -9,5 +9,7 @@ namespace DataAccess.Repositories
         void Add(ServiceItem serviceItem);
         void Update(ServiceItem serviceItem);
         void Delete(int id);
+        Task<List<ServiceItem>> GetAvailableServicesAsync();
     }
-}
+
+    }
