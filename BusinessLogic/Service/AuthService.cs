@@ -54,7 +54,6 @@ namespace BusinessLogic.Service
 
             account.Password = HashPassword(account.Password);
             account.Role = "Customer";
-            account.IsActive = false;
 
             _repo.Add(account);
             _repo.Save();

@@ -1,5 +1,6 @@
 ﻿using BusinessLogic.Interfaces;
 using DataAccess.Repositories;
+using Microsoft.AspNetCore.Http;
 using MotelLeAnh49.Models;
 
 namespace BusinessLogic.Services
@@ -23,27 +24,45 @@ namespace BusinessLogic.Services
             return _roomRepository.GetById(id);
         }
 
-        public void CreateRoom(Room room, int adminId, List<string> imagePaths)
+        public void CreateRoom(Room room, int adminId, List<IFormFile> images, string webRootPath)
         {
             room.AdminId = adminId;
 
-            if (imagePaths != null && imagePaths.Any())
+            var imagePaths = new List<string>();
+
+            if (images != null && images.Any())
             {
-                room.RoomImages = imagePaths.Select(path => new RoomImage
+                string uploadFolder = Path.Combine(webRootPath, "images/rooms");
+                Directory.CreateDirectory(uploadFolder);
+
+                foreach (var file in images)
                 {
-                    ImagePath = path
-                }).ToList();
+                    string fileName = Guid.NewGuid() + Path.GetExtension(file.FileName);
+                    string filePath = Path.Combine(uploadFolder, fileName);
+
+                    using (var stream = new FileStream(filePath, FileMode.Create))
+                    {
+                        file.CopyTo(stream);
+                    }
+
+                    imagePaths.Add("/images/rooms/" + fileName);
+                }
             }
+
+            room.RoomImages = imagePaths.Select(p => new RoomImage
+            {
+                ImagePath = p
+            }).ToList();
 
             _roomRepository.Add(room);
         }
 
-        public bool UpdateRoom(Room room, List<string> newImagePaths, List<int> deletedImageIds)
+        public bool UpdateRoom(Room room, List<IFormFile> images, List<int> deletedImageIds, string webRootPath)
         {
             var existing = _roomRepository.GetById(room.Id);
             if (existing == null) return false;
 
-            // Cập nhật thông tin phòng
+            // update info
             existing.RoomNumber = room.RoomNumber;
             existing.RoomType = room.RoomType;
             existing.OvernightPrice = room.OvernightPrice;
@@ -53,7 +72,7 @@ namespace BusinessLogic.Services
             existing.MaxGuests = room.MaxGuests;
             existing.ExtraGuestFee = room.ExtraGuestFee;
 
-            // XÓA ảnh cũ
+            // delete images
             if (deletedImageIds != null && deletedImageIds.Any())
             {
                 existing.RoomImages = existing.RoomImages
@@ -61,14 +80,25 @@ namespace BusinessLogic.Services
                     .ToList();
             }
 
-            // THÊM ảnh mới
-            if (newImagePaths != null && newImagePaths.Any())
+            // upload new images
+            if (images != null && images.Any())
             {
-                foreach (var path in newImagePaths)
+                string uploadFolder = Path.Combine(webRootPath, "images/rooms");
+                Directory.CreateDirectory(uploadFolder);
+
+                foreach (var file in images)
                 {
+                    string fileName = Guid.NewGuid() + Path.GetExtension(file.FileName);
+                    string filePath = Path.Combine(uploadFolder, fileName);
+
+                    using (var stream = new FileStream(filePath, FileMode.Create))
+                    {
+                        file.CopyTo(stream);
+                    }
+
                     existing.RoomImages.Add(new RoomImage
                     {
-                        ImagePath = path
+                        ImagePath = "/images/rooms/" + fileName
                     });
                 }
             }

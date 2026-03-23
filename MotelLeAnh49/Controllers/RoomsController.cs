@@ -44,7 +44,6 @@ public class RoomsController : Controller
     }
 
     [HttpPost]
-    [ValidateAntiForgeryToken]
     public async Task<IActionResult> Create(Room room, List<IFormFile> Images)
     {
         if (!ModelState.IsValid)
@@ -52,28 +51,8 @@ public class RoomsController : Controller
 
         int adminId = HttpContext.Session.GetInt32("AdminId").Value;
 
-        var imagePaths = new List<string>();
+        _roomService.CreateRoom(room, adminId, Images, _env.WebRootPath);
 
-        if (Images != null && Images.Any())
-        {
-            string uploadFolder = Path.Combine(_env.WebRootPath, "images/rooms");
-            Directory.CreateDirectory(uploadFolder);
-
-            foreach (var file in Images)
-            {
-                string fileName = Guid.NewGuid() + Path.GetExtension(file.FileName);
-                string filePath = Path.Combine(uploadFolder, fileName);
-
-                using (var stream = new FileStream(filePath, FileMode.Create))
-                {
-                    await file.CopyToAsync(stream);
-                }
-
-                imagePaths.Add("/images/rooms/" + fileName);
-            }
-        }
-
-        _roomService.CreateRoom(room, adminId, imagePaths);
         await _hubContext.Clients.All.SendAsync("RoomUpdated");
 
         return RedirectToAction(nameof(Index));
@@ -94,39 +73,18 @@ public class RoomsController : Controller
     [HttpPost]
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Edit(
-     Room room,
-     List<IFormFile> Images,
-     List<int> DeletedImageIds)
+    Room room,
+    List<IFormFile> Images,
+    List<int> DeletedImageIds)
     {
         if (!ModelState.IsValid)
             return View(room);
 
-        var imagePaths = new List<string>();
-
-        // Upload ảnh mới
-        if (Images != null && Images.Any())
-        {
-            string uploadFolder = Path.Combine(_env.WebRootPath, "images/rooms");
-            Directory.CreateDirectory(uploadFolder);
-
-            foreach (var file in Images)
-            {
-                string fileName = Guid.NewGuid() + Path.GetExtension(file.FileName);
-                string filePath = Path.Combine(uploadFolder, fileName);
-
-                using (var stream = new FileStream(filePath, FileMode.Create))
-                {
-                    await file.CopyToAsync(stream);
-                }
-
-                imagePaths.Add("/images/rooms/" + fileName);
-            }
-        }
-
-        // Gọi service mới
-        if (!_roomService.UpdateRoom(room, imagePaths, DeletedImageIds))
+        if (!_roomService.UpdateRoom(room, Images, DeletedImageIds, _env.WebRootPath))
             return NotFound();
+
         await _hubContext.Clients.All.SendAsync("RoomUpdated");
+
         return RedirectToAction(nameof(Index));
     }
 

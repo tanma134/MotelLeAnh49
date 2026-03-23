@@ -34,7 +34,10 @@ namespace MotelLeAnh49.Controllers
             }
 
             if (!account.IsActive)
-                return null;
+            {
+                ViewBag.Error = "Tài khoản chưa kích hoạt";
+                return View();
+            }
 
             // Lưu session
             HttpContext.Session.SetString("Username", account.Username);
@@ -55,6 +58,7 @@ namespace MotelLeAnh49.Controllers
 
         // REGISTER
         [HttpPost]
+        [HttpPost]
         public IActionResult Register(Account account, Customer customer)
         {
             if (_authService.IsUsernameExist(account.Username))
@@ -71,19 +75,24 @@ namespace MotelLeAnh49.Controllers
 
             string otp = _authService.GenerateOTP();
 
+            // Lưu OTP
             HttpContext.Session.SetString("OTP", otp);
             HttpContext.Session.SetString("OTPTime", DateTime.Now.ToString());
 
+            // 🔥 Lưu FULL dữ liệu
             HttpContext.Session.SetString("RegUsername", account.Username);
             HttpContext.Session.SetString("RegEmail", account.Email);
             HttpContext.Session.SetString("RegPassword", account.Password);
+
             HttpContext.Session.SetString("RegFullName", customer.FullName);
+            HttpContext.Session.SetString("RegPhone", customer.Phone ?? "");
+            HttpContext.Session.SetString("RegAddress", customer.Address ?? "");
+            HttpContext.Session.SetString("RegIdentity", customer.IdentityNumber ?? "");
 
             _emailService.SendOTP(account.Email, otp);
 
             return RedirectToAction("VerifyOTP");
         }
-
         // VERIFY OTP PAGE
         public IActionResult VerifyOTP()
         {
@@ -91,6 +100,7 @@ namespace MotelLeAnh49.Controllers
         }
 
         // VERIFY OTP
+        [HttpPost]
         [HttpPost]
         public IActionResult VerifyOTP(string otp)
         {
@@ -117,22 +127,23 @@ namespace MotelLeAnh49.Controllers
                 return View();
             }
 
-            // lấy dữ liệu đăng ký
-            var username = HttpContext.Session.GetString("RegUsername");
-            var email = HttpContext.Session.GetString("RegEmail");
-            var password = HttpContext.Session.GetString("RegPassword");
-            var fullName = HttpContext.Session.GetString("RegFullName");
-
+            // 🔥 LẤY FULL DATA
             var account = new Account
             {
-                Username = username,
-                Email = email,
-                Password = password
+                Username = HttpContext.Session.GetString("RegUsername"),
+                Email = HttpContext.Session.GetString("RegEmail"),
+                Password = HttpContext.Session.GetString("RegPassword"),
+                Role = "Customer",
+                IsActive = true
             };
 
             var customer = new Customer
             {
-                FullName = fullName
+                FullName = HttpContext.Session.GetString("RegFullName"),
+                Phone = HttpContext.Session.GetString("RegPhone"),
+                Address = HttpContext.Session.GetString("RegAddress"),
+                IdentityNumber = HttpContext.Session.GetString("RegIdentity"),
+                Email = HttpContext.Session.GetString("RegEmail")
             };
 
             _authService.Register(account, customer);
@@ -144,6 +155,9 @@ namespace MotelLeAnh49.Controllers
             HttpContext.Session.Remove("RegEmail");
             HttpContext.Session.Remove("RegPassword");
             HttpContext.Session.Remove("RegFullName");
+            HttpContext.Session.Remove("RegPhone");
+            HttpContext.Session.Remove("RegAddress");
+            HttpContext.Session.Remove("RegIdentity");
 
             return RedirectToAction("Login");
         }
