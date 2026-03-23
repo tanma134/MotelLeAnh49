@@ -93,8 +93,11 @@
         Bạn có chắc chắn muốn xoá phòng <b>@Model.RoomNumber</b> không?<br />
         Hành động này không thể hoàn tác!
     </p>
-    <form method="post">
+    <form asp-action="DeleteConfirmed" method="post">
+        @Html.AntiForgeryToken()
+
         <input type="hidden" asp-for="Id" />
+
         <div class="button-group">
             <button type="submit">🗑️ Xác nhận xoá</button>
             <a asp-action="Index" class="btn-cancel">❌ Huỷ bỏ</a>

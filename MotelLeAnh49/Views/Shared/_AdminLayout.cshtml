@@ -107,12 +107,13 @@
             .withUrl("/roomHub")
             .build();
 
-        connection.on("RoomUpdated", function () {
+                connection.on("RoomUpdated", function () {
 
-            console.log("Room updated");
+            const path = window.location.pathname.toLowerCase();
 
-            // reload page khi room thay đổi
-            location.reload();
+            if (path.includes("/rooms") && !path.includes("create") && !path.includes("edit") && !path.includes("delete")) {
+                location.reload();
+            }
 
         });
 
