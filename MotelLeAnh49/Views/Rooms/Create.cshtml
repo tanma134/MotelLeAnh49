@@ -2,6 +2,7 @@
 @{
     Layout = "~/Views/Shared/_AdminLayout.cshtml";
 }
+
 <style>
     body {
         font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -22,10 +23,18 @@
     h2 {
         color: #2c3e50;
         margin-bottom: 30px;
-        font-size: 28px;
         text-align: center;
         border-bottom: 3px solid #3498db;
         padding-bottom: 10px;
+    }
+
+    .validation-summary {
+        background: #ffe6e6;
+        color: #e74c3c;
+        padding: 12px;
+        margin-bottom: 20px;
+        border-left: 5px solid #e74c3c;
+        border-radius: 8px;
     }
 
     .form-group {
@@ -33,134 +42,134 @@
     }
 
     label {
-        display: block;
-        margin-bottom: 8px;
-        color: #555;
         font-weight: 600;
-        font-size: 14px;
+        margin-bottom: 6px;
+        display: block;
     }
 
     input {
         width: 100%;
-        padding: 12px 16px;
+        padding: 12px;
         border: 2px solid #e0e0e0;
         border-radius: 8px;
-        font-size: 15px;
-        transition: all 0.3s ease;
-        box-sizing: border-box;
+        transition: 0.3s;
     }
 
         input:focus {
-            outline: none;
             border-color: #667eea;
-            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+            box-shadow: 0 0 0 3px rgba(102,126,234,0.1);
         }
 
-    .button-group {
-        margin-top: 30px;
-        display: flex;
-        gap: 10px;
+        /* 🔥 input lỗi */
+        input.input-validation-error {
+            border-color: #e74c3c;
+            background: #fff5f5;
+        }
+
+    .validation-error {
+        color: #e74c3c;
+        font-size: 13px;
+        margin-top: 5px;
+        display: block;
     }
 
     button {
         flex: 1;
         padding: 14px;
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        background: linear-gradient(135deg, #667eea, #764ba2);
         color: white;
         border: none;
         border-radius: 8px;
-        font-size: 16px;
         font-weight: 600;
-        cursor: pointer;
-        transition: all 0.3s ease;
     }
 
-        button:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
-        }
+    .button-group {
+        display: flex;
+        gap: 10px;
+        margin-top: 20px;
+    }
 
     .btn-back {
         flex: 1;
         padding: 14px;
-        background: #95a5a6;
+        background: gray;
         color: white;
-        text-decoration: none;
-        border-radius: 8px;
-        font-size: 16px;
-        font-weight: 600;
         text-align: center;
-        transition: all 0.3s ease;
-        display: inline-block;
+        border-radius: 8px;
+        text-decoration: none;
     }
-
-        .btn-back:hover {
-            background: #7f8c8d;
-            transform: translateY(-2px);
-        }
 </style>
 
 <div class="form-container">
     <h2>➕ Thêm phòng mới</h2>
 
-    <form asp-action="Create"
-          method="post"
-          enctype="multipart/form-data">
+    <!-- 🔥 HIỂN THỊ LỖI -->
+    <div asp-validation-summary="ModelOnly" class="validation-summary"></div>
+
+    <form asp-action="Create" method="post" enctype="multipart/form-data">
 
         <div class="form-group">
             <label>Số phòng</label>
-            <input asp-for="RoomNumber" placeholder="VD: P101" required />
+            <input asp-for="RoomNumber" placeholder="VD: P101" />
+            <span asp-validation-for="RoomNumber" class="validation-error"></span>
         </div>
 
         <div class="form-group">
             <label>Loại phòng</label>
-            <input asp-for="RoomType" placeholder="VD: Standard, VIP" required />
+            <input asp-for="RoomType" />
+            <span asp-validation-for="RoomType" class="validation-error"></span>
         </div>
 
         <div class="form-group">
-            <label>Giá qua đêm (VNĐ)</label>
-            <input asp-for="OvernightPrice" type="number" required />
+            <label>Giá qua đêm</label>
+            <input asp-for="OvernightPrice" type="number" />
+            <span asp-validation-for="OvernightPrice" class="validation-error"></span>
         </div>
 
         <div class="form-group">
-            <label>Giá ngày (VNĐ)</label>
-            <input asp-for="DayPrice" type="number" required />
+            <label>Giá ngày</label>
+            <input asp-for="DayPrice" type="number" />
+            <span asp-validation-for="DayPrice" class="validation-error"></span>
         </div>
 
         <div class="form-group">
-            <label>Giá giờ đầu (VNĐ)</label>
-            <input asp-for="FirstHourPrice" type="number" required />
+            <label>Giá giờ đầu</label>
+            <input asp-for="FirstHourPrice" type="number" />
+            <span asp-validation-for="FirstHourPrice" class="validation-error"></span>
         </div>
 
         <div class="form-group">
-            <label>Giá giờ tiếp theo (VNĐ)</label>
-            <input asp-for="NextHourPrice" type="number" required />
+            <label>Giá giờ tiếp</label>
+            <input asp-for="NextHourPrice" type="number" />
+            <span asp-validation-for="NextHourPrice" class="validation-error"></span>
         </div>
 
         <div class="form-group">
-            <label>Số khách tối đa</label>
-            <input asp-for="MaxGuests" type="number" required />
+            <label>Số khách</label>
+            <input asp-for="MaxGuests" type="number" />
+            <span asp-validation-for="MaxGuests" class="validation-error"></span>
         </div>
 
         <div class="form-group">
-            <label>Phụ thu thêm người (VNĐ)</label>
-            <input asp-for="ExtraGuestFee" type="number" required />
+            <label>Phụ thu</label>
+            <input asp-for="ExtraGuestFee" type="number" />
+            <span asp-validation-for="ExtraGuestFee" class="validation-error"></span>
         </div>
 
-        <!-- 🔥 THÊM PHẦN UPLOAD ẢNH -->
         <div class="form-group">
             <label>Ảnh phòng</label>
-            <input type="file"
-                   name="Images"
-                   multiple
-                   accept="image/*"
-                   class="form-control" />
-            <small>Có thể chọn nhiều ảnh</small>
+            <input type="file" name="Images" multiple accept="image/*" />
         </div>
 
         <div class="button-group">
-            <button type="submit">💾 Lưu phòng</button>
+            <button type="submit">💾 Lưu</button>
             <a asp-action="Index" class="btn-back">⬅ Quay lại</a>
         </div>
     </form>
 </div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

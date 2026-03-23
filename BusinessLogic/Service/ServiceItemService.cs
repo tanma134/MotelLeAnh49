@@ -1,4 +1,4 @@
-using BusinessLogic.Interfaces;
+﻿using BusinessLogic.Interfaces;
 using DataAccess.Repositories;
 using MotelLeAnh49.Models;
 using DataAccess.Models;
@@ -34,7 +34,22 @@ namespace BusinessLogic.Services
 
         public void UpdateService(ServiceItem item)
         {
-            _serviceItemRepository.Update(item);
+            var existing = _serviceItemRepository.GetById(item.ServiceItemId);
+
+            if (existing == null) return;
+
+            existing.Name = item.Name;
+            existing.Description = item.Description;
+            existing.Price = item.Price;
+            existing.IsAvailable = item.IsAvailable;
+
+            // 🔥 QUAN TRỌNG: không overwrite null
+            if (!string.IsNullOrEmpty(item.ImageUrl))
+            {
+                existing.ImageUrl = item.ImageUrl;
+            }
+
+            _serviceItemRepository.Update(existing);
         }
 
         public void DeleteService(int id)

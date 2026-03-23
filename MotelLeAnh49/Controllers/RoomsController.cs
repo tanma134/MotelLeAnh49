@@ -49,13 +49,21 @@ public class RoomsController : Controller
         if (!ModelState.IsValid)
             return View(room);
 
-        int adminId = HttpContext.Session.GetInt32("AdminId").Value;
+        try
+        {
+            int adminId = HttpContext.Session.GetInt32("AdminId").Value;
 
-        _roomService.CreateRoom(room, adminId, Images, _env.WebRootPath);
+            _roomService.CreateRoom(room, adminId, Images, _env.WebRootPath);
 
-        await _hubContext.Clients.All.SendAsync("RoomUpdated");
+            await _hubContext.Clients.All.SendAsync("RoomUpdated");
 
-        return RedirectToAction(nameof(Index));
+            return RedirectToAction(nameof(Index));
+        }
+        catch (Exception ex)
+        {
+            ModelState.AddModelError("", ex.Message); // 🔥 show lỗi ra UI
+            return View(room);
+        }
     }
 
     // ================= EDIT =================
@@ -73,19 +81,27 @@ public class RoomsController : Controller
     [HttpPost]
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Edit(
-    Room room,
-    List<IFormFile> Images,
-    List<int> DeletedImageIds)
+        Room room,
+        List<IFormFile> Images,
+        List<int> DeletedImageIds)
     {
         if (!ModelState.IsValid)
             return View(room);
 
-        if (!_roomService.UpdateRoom(room, Images, DeletedImageIds, _env.WebRootPath))
-            return NotFound();
+        try
+        {
+            if (!_roomService.UpdateRoom(room, Images, DeletedImageIds, _env.WebRootPath))
+                return NotFound();
 
-        await _hubContext.Clients.All.SendAsync("RoomUpdated");
+            await _hubContext.Clients.All.SendAsync("RoomUpdated");
 
-        return RedirectToAction(nameof(Index));
+            return RedirectToAction(nameof(Index));
+        }
+        catch (Exception ex)
+        {
+            ModelState.AddModelError("", ex.Message); // 🔥 show lỗi
+            return View(room);
+        }
     }
 
     // ================= DELETE =================
@@ -104,11 +120,21 @@ public class RoomsController : Controller
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> DeleteConfirmed(int id)
     {
-        _roomService.DeleteRoom(id);
+        try
+        {
+            _roomService.DeleteRoom(id);
 
-        await _hubContext.Clients.All.SendAsync("RoomUpdated");
+            await _hubContext.Clients.All.SendAsync("RoomUpdated");
 
-        return RedirectToAction(nameof(Index));
+            return RedirectToAction(nameof(Index));
+        }
+        catch (Exception ex)
+        {
+            ModelState.AddModelError("", ex.Message);
+
+            var room = _roomService.GetRoomById(id);
+            return View("Delete", room);
+        }
     }
 
     // ================= SEARCH =================

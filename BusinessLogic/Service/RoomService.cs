@@ -26,6 +26,11 @@ namespace BusinessLogic.Services
 
         public void CreateRoom(Room room, int adminId, List<IFormFile> images, string webRootPath)
         {
+            if (_roomRepository.IsRoomNumberExist(room.RoomNumber))
+            {
+                throw new Exception("Số phòng đã tồn tại");
+            }
+
             room.AdminId = adminId;
 
             var imagePaths = new List<string>();
@@ -62,6 +67,10 @@ namespace BusinessLogic.Services
             var existing = _roomRepository.GetById(room.Id);
             if (existing == null) return false;
 
+            if (_roomRepository.IsRoomNumberExist(room.RoomNumber, room.Id))
+            {
+                throw new Exception("Số phòng đã tồn tại");
+            }
             // update info
             existing.RoomNumber = room.RoomNumber;
             existing.RoomType = room.RoomType;
@@ -109,6 +118,11 @@ namespace BusinessLogic.Services
 
         public void DeleteRoom(int id)
         {
+            if (_roomRepository.HasActiveBooking(id))
+            {
+                throw new Exception("Phòng đang có booking hoặc chờ duyệt, không thể xóa");
+            }
+
             _roomRepository.Delete(id);
         }
 

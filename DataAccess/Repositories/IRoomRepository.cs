@@ -13,5 +13,8 @@ namespace DataAccess.Repositories
         List<Room> SearchAvailable(DateTime checkIn, DateTime checkOut, int totalGuests);
         bool IsAvailable(int roomId, DateTime checkIn, DateTime checkOut);
         Task<List<Room>> GetAvailableRoomsAsync();
+        bool IsRoomNumberExist(string roomNumber);
+        bool IsRoomNumberExist(string roomNumber, int excludeId);
+        bool HasActiveBooking(int roomId);
     }
 }

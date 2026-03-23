@@ -87,5 +87,20 @@ namespace DataAccess.Repositories
                     .Any(b => b.RoomId == r.Id && b.CheckOut > now))
                 .ToListAsync();
         }
+        public bool IsRoomNumberExist(string roomNumber)
+        {
+            return _context.Rooms.Any(r => r.RoomNumber == roomNumber);
+        }
+
+        public bool IsRoomNumberExist(string roomNumber, int excludeId)
+        {
+            return _context.Rooms.Any(r => r.RoomNumber == roomNumber && r.Id != excludeId);
+        }
+        public bool HasActiveBooking(int roomId)
+        {
+            return _context.Bookings
+                .Any(b => b.RoomId == roomId
+                       && (b.Status == "Pending" || b.Status == "Confirmed"));
+        }
     }
 }

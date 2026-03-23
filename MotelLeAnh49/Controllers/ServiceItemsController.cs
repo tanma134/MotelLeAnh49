@@ -1,4 +1,4 @@
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using BusinessLogic.Interfaces;
 using MotelLeAnh49.Models;
 
@@ -71,36 +71,44 @@ namespace MotelLeAnh49.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(ServiceItem serviceItem, IFormFile ImageFile)
         {
-            if (ModelState.IsValid)
+            var existing = _serviceItemService.GetServiceById(serviceItem.ServiceItemId);
+            if (existing == null) return NotFound();
+
+            if (!ModelState.IsValid)
             {
-                if (ImageFile != null && ImageFile.Length > 0)
-                {
-                    var folderPath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot/images/services");
-
-                    if (!Directory.Exists(folderPath))
-                    {
-                        Directory.CreateDirectory(folderPath);
-                    }
-
-                    var fileName = Guid.NewGuid().ToString() + Path.GetExtension(ImageFile.FileName);
-                    var filePath = Path.Combine(folderPath, fileName);
-
-                    using (var stream = new FileStream(filePath, FileMode.Create))
-                    {
-                        await ImageFile.CopyToAsync(stream);
-                    }
-
-                    serviceItem.ImageUrl = "/images/services/" + fileName;
-                }
-
-                _serviceItemService.UpdateService(serviceItem);
-                return RedirectToAction(nameof(Index));
+                // 🔥 giữ ảnh khi validate fail
+                serviceItem.ImageUrl = existing.ImageUrl;
+                return View(serviceItem);
             }
 
-            return View(serviceItem);
+            // 🔥 mặc định lấy ảnh cũ
+            serviceItem.ImageUrl = existing.ImageUrl;
+
+            if (ImageFile != null && ImageFile.Length > 0)
+            {
+                var folderPath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot/images/services");
+
+                if (!Directory.Exists(folderPath))
+                {
+                    Directory.CreateDirectory(folderPath);
+                }
+
+                var fileName = Guid.NewGuid().ToString() + Path.GetExtension(ImageFile.FileName);
+                var filePath = Path.Combine(folderPath, fileName);
+
+                using (var stream = new FileStream(filePath, FileMode.Create))
+                {
+                    await ImageFile.CopyToAsync(stream);
+                }
+
+                serviceItem.ImageUrl = "/images/services/" + fileName;
+            }
+
+            _serviceItemService.UpdateService(serviceItem);
+            return RedirectToAction(nameof(Index));
         }
 
-        // GET: ServiceItems/Delete/5
+
         public IActionResult Delete(int id)
         {
             var service = _serviceItemService.GetServiceById(id);
