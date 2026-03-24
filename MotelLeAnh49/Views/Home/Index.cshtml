@@ -10,7 +10,348 @@
         border-radius: 12px;
         box-shadow: 0 10px 40px rgba(0,0,0,0.1);
     }
+
+    /* ====== FLOATING CHAT WIDGET ====== */
+    #chat-fab {
+        position: fixed;
+        bottom: 28px;
+        right: 28px;
+        width: 56px;
+        height: 56px;
+        border-radius: 50%;
+        background: #c9a84c;
+        border: none;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        box-shadow: 0 4px 20px rgba(201,168,76,.45);
+        z-index: 9999;
+        transition: transform .2s, background .15s;
+    }
+
+        #chat-fab:hover {
+            background: #e8c97a;
+            transform: scale(1.07);
+        }
+
+        #chat-fab svg {
+            width: 22px;
+            height: 22px;
+            fill: none;
+            stroke: #1a1915;
+            stroke-width: 2;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+        }
+
+    #chat-badge {
+        position: absolute;
+        top: -4px;
+        right: -4px;
+        width: 18px;
+        height: 18px;
+        border-radius: 50%;
+        background: #e74c3c;
+        color: #fff;
+        font-size: 10px;
+        font-weight: 700;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border: 2px solid #fff;
+    }
+
+    #chat-box {
+        position: fixed;
+        bottom: 96px;
+        right: 28px;
+        width: 360px;
+        height: 520px;
+        border-radius: 16px;
+        overflow: hidden;
+        display: flex;
+        flex-direction: column;
+        background: #0e0d0b;
+        border: .5px solid #3a3930;
+        box-shadow: 0 16px 48px rgba(0,0,0,.6);
+        z-index: 9998;
+        transform: scale(.92) translateY(20px);
+        opacity: 0;
+        transition: transform .28s cubic-bezier(.34,1.56,.64,1), opacity .2s;
+        pointer-events: none;
+        font-family: 'DM Mono', 'Courier New', monospace;
+    }
+
+        #chat-box.cx-open {
+            transform: scale(1) translateY(0);
+            opacity: 1;
+            pointer-events: all;
+        }
+
+    .cx-header {
+        padding: 14px 16px;
+        background: #1a1915;
+        border-bottom: .5px solid #3a3930;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        flex-shrink: 0;
+    }
+
+    .cx-icon {
+        width: 34px;
+        height: 34px;
+        border-radius: 50%;
+        background: #c9a84c;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 15px;
+        flex-shrink: 0;
+    }
+
+    .cx-title {
+        font-family: 'DM Serif Display', Georgia, serif;
+        font-size: 14px;
+        color: #f0ead8;
+        line-height: 1.2;
+    }
+
+    .cx-sub {
+        font-size: 10px;
+        color: #8a8674;
+        text-transform: uppercase;
+        letter-spacing: .04em;
+        margin-top: 2px;
+    }
+
+    .cx-dot {
+        width: 7px;
+        height: 7px;
+        border-radius: 50%;
+        background: #4caf7d;
+        margin-left: auto;
+        flex-shrink: 0;
+    }
+
+    .cx-close-btn {
+        margin-left: 8px;
+        width: 26px;
+        height: 26px;
+        border-radius: 50%;
+        background: transparent;
+        border: .5px solid #3a3930;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #8a8674;
+        font-size: 13px;
+        line-height: 1;
+        transition: background .15s;
+        flex-shrink: 0;
+    }
+
+        .cx-close-btn:hover {
+            background: #2e2d27;
+            color: #f0ead8;
+        }
+
+    .cx-msgs {
+        flex: 1;
+        overflow-y: auto;
+        padding: 14px;
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        scrollbar-width: thin;
+        scrollbar-color: #3a3930 transparent;
+    }
+
+        .cx-msgs::-webkit-scrollbar {
+            width: 4px;
+        }
+
+        .cx-msgs::-webkit-scrollbar-thumb {
+            background: #3a3930;
+            border-radius: 4px;
+        }
+
+    .cx-msg {
+        display: flex;
+        flex-direction: column;
+        max-width: 86%;
+    }
+
+        .cx-msg.user {
+            align-self: flex-end;
+            align-items: flex-end;
+        }
+
+        .cx-msg.ai {
+            align-self: flex-start;
+        }
+
+    .cx-lbl {
+        font-size: 10px;
+        text-transform: uppercase;
+        letter-spacing: .05em;
+        color: #8a8674;
+        margin-bottom: 3px;
+    }
+
+    .cx-msg.user .cx-lbl {
+        color: #a07a2a;
+    }
+
+    .cx-bubble {
+        padding: 9px 13px;
+        border-radius: 12px;
+        font-size: 12.5px;
+        line-height: 1.6;
+        white-space: pre-wrap;
+        word-break: break-word;
+    }
+
+    .cx-msg.user .cx-bubble {
+        background: #2a2615;
+        border: .5px solid #c9a84c;
+        color: #f0ead8;
+        border-bottom-right-radius: 3px;
+    }
+
+    .cx-msg.ai .cx-bubble {
+        background: #1e1e1a;
+        border: .5px solid #3a3930;
+        color: #ccc8b8;
+        border-bottom-left-radius: 3px;
+    }
+
+    .cx-typing-dots {
+        display: flex;
+        gap: 4px;
+        padding: 11px 13px;
+        align-items: center;
+    }
+
+        .cx-typing-dots span {
+            width: 5px;
+            height: 5px;
+            border-radius: 50%;
+            background: #c9a84c;
+            animation: cxBlink 1.2s ease-in-out infinite;
+        }
+
+            .cx-typing-dots span:nth-child(2) {
+                animation-delay: .2s;
+            }
+
+            .cx-typing-dots span:nth-child(3) {
+                animation-delay: .4s;
+            }
+
+
+    @@keyframes cxBlink {
+        0%
+
+    {
+        opacity: .2;
+    }
+
+    40% {
+        opacity: 1;
+    }
+
+    100% {
+        opacity: .2;
+    }
+
+    }
+    
+
+    .cx-composer {
+        border-top: .5px solid #3a3930 !important;
+        padding: 12px 14px !important;
+        display: flex !important;
+        flex-direction: row !important;
+        align-items: flex-end !important;
+        gap: 8px !important;
+        background: #1a1915 !important;
+        flex-shrink: 0 !important;
+        box-sizing: border-box !important;
+    }
+
+        .cx-composer textarea {
+            flex: 1 1 auto !important;
+            min-width: 0 !important;
+            background: #2e2d27 !important;
+            border: .5px solid #3a3930 !important;
+            border-radius: 10px !important;
+            padding: 8px 11px !important;
+            font-family: 'DM Mono', 'Courier New', monospace !important;
+            font-size: 12.5px !important;
+            color: #f0ead8 !important;
+            resize: none !important;
+            outline: none !important;
+            min-height: 38px !important;
+            max-height: 110px !important;
+            height: 38px !important;
+            line-height: 1.5 !important;
+            transition: border-color .2s !important;
+            box-sizing: border-box !important;
+            display: block !important;
+        }
+
+            .cx-composer textarea::placeholder {
+                color: #8a8674;
+            }
+
+            .cx-composer textarea:focus {
+                border-color: #c9a84c !important;
+                box-shadow: none !important;
+            }
+
+    .cx-send-btn {
+        width: 36px !important;
+        height: 36px !important;
+        min-width: 36px !important;
+        border-radius: 50% !important;
+        background: #c9a84c !important;
+        border: none !important;
+        cursor: pointer !important;
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        flex-shrink: 0 !important;
+        transition: background .15s, transform .1s;
+        padding: 0 !important;
+    }
+
+        .cx-send-btn:hover {
+            background: #e8c97a !important;
+        }
+
+        .cx-send-btn:active {
+            transform: scale(.93);
+        }
+
+        .cx-send-btn:disabled {
+            opacity: .45 !important;
+            cursor: not-allowed !important;
+        }
+
+        .cx-send-btn svg {
+            width: 14px !important;
+            height: 14px !important;
+            fill: none !important;
+            stroke: #1a1915 !important;
+            stroke-width: 2;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+        }
 </style>
+
 <!-- HERO SLIDER -->
 <div id="heroCarousel" class="carousel slide hero-slider" data-bs-ride="carousel" data-bs-interval="5000">
     <div class="carousel-indicators">
@@ -30,7 +371,6 @@
                 <a href="#booking" class="btn btn-gold fade-in-up">Đặt phòng ngay</a>
             </div>
         </div>
-
 
         <div class="carousel-item">
             <img src="@Url.Content("~/images/rooms/chonoicairang.jpg")"
@@ -71,23 +411,16 @@
             </h3>
 
             <form id="searchForm">
-
                 <div class="row g-3">
 
                     <div class="col-md-3">
                         <label class="form-label">Ngày nhận phòng</label>
-                        <input type="date"
-                               name="CheckIn"
-                               class="form-control"
-                               required>
+                        <input type="date" name="CheckIn" class="form-control" required>
                     </div>
 
                     <div class="col-md-3">
                         <label class="form-label">Ngày trả phòng</label>
-                        <input type="date"
-                               name="CheckOut"
-                               class="form-control"
-                               required>
+                        <input type="date" name="CheckOut" class="form-control" required>
                     </div>
 
                     <div class="col-md-2">
@@ -116,7 +449,6 @@
                     </div>
 
                 </div>
-
             </form>
 
         </div>
@@ -135,12 +467,10 @@
             <div class="col-lg-6 mb-4 mb-lg-0">
                 <div class="row">
                     <div class="col-6">
-                        <img src="@Url.Content("~/images/rooms/anhnhanghi.jpg")"
-                             class="about-img">
+                        <img src="@Url.Content("~/images/rooms/anhnhanghi.jpg")" class="about-img">
                     </div>
                     <div class="col-6">
-                        <img src="@Url.Content("~/images/rooms/anhdem.jpg")"
-                             class="about-img">
+                        <img src="@Url.Content("~/images/rooms/anhdem.jpg")" class="about-img">
                     </div>
                 </div>
             </div>
@@ -359,11 +689,9 @@
                                 <div class="service-icon">
                                     @{
                                         string icon = "bi bi-arrow-through-heart";
-
                                         if (s.Name.ToLower().Contains("wifi")) icon = "bi bi-wifi";
                                         else if (s.Name.ToLower().Contains("giặt")) icon = "bi bi-basket";
                                         else if (s.Name.ToLower().Contains("hồ")) icon = "bi bi-water";
-                           
                                     }
                                     <i class="@icon"></i>
                                 </div>
@@ -470,14 +798,58 @@
     </div>
 </section>
 
-<!-- Scroll Animation Script -->
+<!-- ====== FLOATING CHAT WIDGET ====== -->
+<!-- Nút FAB -->
+<button id="chat-fab" onclick="cxToggle()" title="Chat hỗ trợ">
+    <svg viewBox="0 0 24 24">
+        <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
+    </svg>
+    <span id="chat-badge">1</span>
+</button>
+
+<!-- Cửa sổ chat -->
+<div id="chat-box">
+
+    <!-- Header -->
+    <div class="cx-header">
+        <div class="cx-icon">&#9768;</div>
+        <div>
+            <div class="cx-title">Concierge IA</div>
+            <div class="cx-sub">MotelLeAnh49 &middot; 24/7</div>
+        </div>
+        <div class="cx-dot"></div>
+        <button class="cx-close-btn" onclick="cxToggle()" title="Đóng">&#x2715;</button>
+    </div>
+
+    <!-- Tin nhắn -->
+    <div class="cx-msgs" id="cx-msgs">
+        <div class="cx-msg ai">
+            <div class="cx-lbl">Concierge IA</div>
+            <div class="cx-bubble">Xin chào! Tôi là trợ lý ảo của MotelLeAnh49. Tôi có thể giúp bạn về phòng, giá cả, hoặc đặt phòng!</div>
+        </div>
+    </div>
+
+    <!-- Ô nhập -->
+    <div class="cx-composer">
+        @Html.AntiForgeryToken()
+        <textarea id="cx-input" rows="1" placeholder="Hỏi về phòng, giá, dịch vụ…"></textarea>
+        <button class="cx-send-btn" id="cx-send-btn" onclick="cxSend()" title="Gửi">
+            <svg viewBox="0 0 24 24">
+                <line x1="22" y1="2" x2="11" y2="13" />
+                <polygon points="22 2 15 22 11 13 2 9 22 2" />
+            </svg>
+        </button>
+    </div>
+
+</div>
+
+<!-- ====== SCRIPTS ====== -->
+<!-- Scroll Animation -->
 <script>
-    // Add fade-in animation when scrolling
     const observerOptions = {
         threshold: 0.1,
         rootMargin: '0px 0px -50px 0px'
     };
-
     const observer = new IntersectionObserver((entries) => {
         entries.forEach(entry => {
             if (entry.isIntersecting) {
@@ -485,35 +857,133 @@
             }
         });
     }, observerOptions);
-
     document.querySelectorAll('.room-card, .service-card, .promotion-card').forEach(el => {
         observer.observe(el);
     });
 </script>
+
+<!-- jQuery + Search Form -->
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-
 <script>
-
-    $("#searchForm").submit(function(e){
-
+    $("#searchForm").submit(function (e) {
         e.preventDefault();
-
         $.ajax({
-
             url: "/Rooms/Search",
             type: "POST",
             data: $(this).serialize(),
-
-            success: function(result){
+            success: function (result) {
                 $("#roomResults").html(result);
             },
-
-            error: function(err){
+            error: function (err) {
                 alert(err.responseText);
             }
-
         });
+    });
+</script>
 
+<!-- Chat Widget Script -->
+<script>
+    let cxIsOpen = false;
+
+    function cxToggle() {
+        cxIsOpen = !cxIsOpen;
+        document.getElementById('chat-box').classList.toggle('cx-open', cxIsOpen);
+        document.getElementById('chat-badge').style.display = 'none';
+        if (cxIsOpen) {
+            setTimeout(() => document.getElementById('cx-input').focus(), 300);
+        }
+    }
+
+    // Auto-resize textarea
+    document.getElementById('cx-input').addEventListener('input', function () {
+        this.style.height = 'auto';
+        this.style.height = Math.min(this.scrollHeight, 110) + 'px';
     });
 
+    // Gửi bằng Enter (Shift+Enter = xuống dòng)
+    document.getElementById('cx-input').addEventListener('keydown', function (e) {
+        if (e.key === 'Enter' && !e.shiftKey) {
+            e.preventDefault();
+            cxSend();
+        }
+    });
+
+    function cxAddMessage(role, text) {
+        const msgs = document.getElementById('cx-msgs');
+        const wrapper = document.createElement('div');
+        wrapper.className = 'cx-msg ' + role;
+        const label = document.createElement('div');
+        label.className = 'cx-lbl';
+        label.textContent = role === 'user' ? 'Bạn' : 'Concierge IA';
+        const bubble = document.createElement('div');
+        bubble.className = 'cx-bubble';
+        bubble.textContent = text;
+        wrapper.appendChild(label);
+        wrapper.appendChild(bubble);
+        msgs.appendChild(wrapper);
+        msgs.scrollTop = msgs.scrollHeight;
+    }
+
+    function cxShowTyping() {
+        const msgs = document.getElementById('cx-msgs');
+        const wrapper = document.createElement('div');
+        wrapper.className = 'cx-msg ai';
+        wrapper.id = 'cx-typing-indicator';
+        const label = document.createElement('div');
+        label.className = 'cx-lbl';
+        label.textContent = 'Concierge IA';
+        const bubble = document.createElement('div');
+        bubble.className = 'cx-bubble cx-typing-dots';
+        bubble.innerHTML = '<span></span><span></span><span></span>';
+        wrapper.appendChild(label);
+        wrapper.appendChild(bubble);
+        msgs.appendChild(wrapper);
+        msgs.scrollTop = msgs.scrollHeight;
+    }
+
+    function cxHideTyping() {
+        const el = document.getElementById('cx-typing-indicator');
+        if (el) el.remove();
+    }
+
+    async function cxSend() {
+        const input = document.getElementById('cx-input');
+        const sendBtn = document.getElementById('cx-send-btn');
+        const text = input.value.trim();
+        if (!text) return;
+
+        input.value = '';
+        input.style.height = 'auto';
+        input.disabled = true;
+        sendBtn.disabled = true;
+
+        cxAddMessage('user', text);
+        cxShowTyping();
+
+        try {
+            const token = document.querySelector('input[name="__RequestVerificationToken"]')?.value ?? '';
+            const res = await fetch('/Chat/Send', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'RequestVerificationToken': token
+                },
+                body: JSON.stringify({ message: text })
+            });
+
+            if (!res.ok) throw new Error('Lỗi server: ' + res.status);
+
+            const data = await res.json();
+            cxHideTyping();
+            cxAddMessage('ai', data.response);
+
+        } catch (err) {
+            cxHideTyping();
+            cxAddMessage('ai', 'Xin lỗi, đã xảy ra lỗi kết nối. Vui lòng thử lại sau.');
+        }
+
+        input.disabled = false;
+        sendBtn.disabled = false;
+        input.focus();
+    }
 </script>

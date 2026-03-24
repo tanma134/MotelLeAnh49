@@ -12,6 +12,7 @@ namespace BusinessLogic.Service
         private readonly IEventRepository _eventRepo;
         private readonly IServiceItemRepository _serviceItemRepo;
         private readonly ICustomerRepository _customerRepo;
+        private readonly IBookingRepository _bookingRepo; // 🔹 THÊM MỚI
 
         public ChatService(
      IOpenAIService openAI,
@@ -19,7 +20,8 @@ namespace BusinessLogic.Service
      IRoomRepository roomRepo,
      IEventRepository eventRepo,
      IServiceItemRepository serviceItemRepo,
-     ICustomerRepository customerRepo)
+     ICustomerRepository customerRepo,
+     IBookingRepository bookingRepo)
         {
             _openAI = openAI;
             _repo = repo;
@@ -27,6 +29,7 @@ namespace BusinessLogic.Service
             _eventRepo = eventRepo;
             _serviceItemRepo = serviceItemRepo;
             _customerRepo = customerRepo;
+            _bookingRepo = bookingRepo;
         }
 
         // Step 3: ProcessUserMessage — called by ChatController
@@ -80,6 +83,40 @@ AI: {h.AiResponse}
 """
         ));
             }
+
+
+            // 🔹 THÊM MỚI: Lịch sử đặt phòng
+            string bookingData = "";
+            if (customerId.HasValue)
+            {
+                var bookings = await _bookingRepo.GetByCustomerIdAsync(customerId.Value);
+
+                if (bookings != null && bookings.Any())
+                {
+                    bookingData = "Lịch sử đặt phòng của khách hàng:\n";
+                    bookingData += string.Join("\n", bookings.Select(b =>
+                        $"""
+Đơn đặt phòng #{b.Id}
+- Phòng: {b.Room?.RoomNumber ?? "N/A"}
+- Loại phòng: {b.Room?.RoomType ?? "N/A"}
+- Nhận phòng: {b.CheckIn:dd/MM/yyyy HH:mm}
+- Trả phòng: {b.CheckOut:dd/MM/yyyy HH:mm}
+- Trạng thái: {b.Status}
+- Tên khách: {b.FullName}
+- SĐT: {b.Phone}
+- Email: {b.Email}
+"""
+                    ));
+                }
+                else
+                {
+                    bookingData = "Khách hàng không có lịch sử đặt phòng.";
+                }
+            }
+            else
+            {
+                bookingData = "Khách chưa đăng nhập, không có lịch sử đặt phòng.";
+            }
             string customerName = "";
 
             if (customerId.HasValue)
@@ -109,16 +146,21 @@ Sự kiện:
 Dịch vụ:
 {serviceData}
 
+Lịch sử đặt phòng:
+{bookingData}
 Câu hỏi:
 {userMessage}
+
+
 
 QUY TẮC:
 - Nếu có tên khách hàng, BẮT BUỘC phải chào theo tên.
 - Không được dùng "anh/chị" chung chung.
 - Ví dụ: "Chào anh Vinh..."
-
-Trả lời tự nhiên, thân thiện, bằng tiếng Việt.
-Nếu phù hợp hãy gợi ý phòng, dịch vụ hoặc sự kiện.
+- Nếu khách hỏi về lịch sử đặt phòng mà không có lịch sử, hãy nói rằng khách chưa có đặt phòng nào.
+- Khi có lịch sử đặt phòng, có thể tham khảo thông tin để trả lời các câu hỏi liên quan.
+- Trả lời tự nhiên, thân thiện, bằng tiếng Việt.
+- Nếu phù hợp hãy gợi ý phòng, dịch vụ hoặc sự kiện
 """;
 
             var aiResponse = await _openAI.SendPromptAsync(prompt);

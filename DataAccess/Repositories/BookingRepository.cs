@@ -53,5 +53,13 @@ namespace DataAccess.Repositories
         {
             _context.SaveChanges();
         }
+        public async Task<List<Booking>> GetByCustomerIdAsync(int customerId)
+        {
+            return await _context.Bookings
+                .Where(b => b.CustomerId == customerId)
+                .Include(b => b.Room) // 🔹 QUAN TRỌNG: Phải eager load Room
+                .OrderByDescending(b => b.CheckIn) // Sắp xếp theo ngày nhận phòng mới nhất
+                .ToListAsync();
+        }
     }
 }

@@ -15,5 +15,6 @@ namespace DataAccess.Repositories
         void Delete(int id);
 
         void Save();
+        Task<List<Booking>> GetByCustomerIdAsync(int customerId);
     }
 }
