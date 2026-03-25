@@ -10,9 +10,8 @@ namespace BusinessLogic.Service
 
         List<Booking> GetByCustomerId(int customerId);
 
-        void Create(Booking booking);
-
-        void Update(Booking booking);
+        Task CreateAsync(Booking booking);
+        Task UpdateAsync(Booking booking);
 
         void Delete(int id);
 

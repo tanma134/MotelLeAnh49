@@ -108,7 +108,7 @@ namespace MotelLeAnh49.Controllers
             HttpContext.Session.SetString("RegAddress", customer.Address ?? "");
             HttpContext.Session.SetString("RegIdentity", customer.IdentityNumber ?? "");
 
-            _emailService.SendOTP(account.Email, otp);
+            _emailService.SendOTPAsync(account.Email, otp);
 
             return RedirectToAction("VerifyOTP");
         }
@@ -202,7 +202,7 @@ namespace MotelLeAnh49.Controllers
             HttpContext.Session.SetString("ResetOTP", otp);
             HttpContext.Session.SetString("ResetEmail", email);
 
-            _emailService.SendOTP(email, otp);
+            _emailService.SendOTPAsync(email, otp);
 
             return RedirectToAction("VerifyResetOTP");
         }

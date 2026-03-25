@@ -398,6 +398,56 @@
                 animation-delay: .4s;
             }
 
+    /* ==================== PHẦN ĐẶT PHÒNG MỚI ==================== */
+    .booking-card {
+        background: white;
+        padding: 30px;
+        border-radius: 12px;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+        position: sticky;
+        top: 100px;
+    }
+
+    .date-picker-group {
+        display: flex;
+        gap: 15px;
+        margin-bottom: 20px;
+    }
+
+    .alert-booked {
+        background: #ffe0e0;
+        color: #c82333;
+        padding: 14px;
+        border-radius: 8px;
+        text-align: center;
+        font-weight: 600;
+        margin: 15px 0;
+    }
+
+    .alert-available {
+        background: #d4edda;
+        color: #155724;
+        padding: 14px;
+        border-radius: 8px;
+        text-align: center;
+        font-weight: 600;
+        margin: 15px 0;
+    }
+
+    .btn-book {
+        width: 100%;
+        padding: 15px;
+        font-size: 18px;
+        font-weight: 700;
+        border: none;
+        border-radius: 8px;
+        cursor: pointer;
+    }
+
+        .btn-book:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
     @@keyframes cxBlink {
         0%, 80%, 100% {
             opacity: .2
@@ -566,7 +616,7 @@
             <!-- ── Cột phải: sidebar đặt phòng ── -->
             <div class="col-lg-4">
                 <div class="booking-card booking-sidebar">
-
+                    <!-- Phần giá cũ giữ nguyên -->
                     <div class="price-summary">
                         <div class="price-row">
                             <span>🌙 Qua đêm</span>
@@ -590,15 +640,38 @@
                         </div>
                     </div>
 
-                    <a asp-controller="Bookings"
-                       asp-action="BookRoom"
-                       asp-route-roomId="@Model.Id"
-                       class="btn btn-gold w-100">
-                        Đặt phòng ngay
-                    </a>
+                    <hr style="margin: 25px 0;">
+
+                    <!-- PHẦN MỚI: KIỂM TRA TÌNH TRẠNG PHÒNG -->
+                    <h5>📅 Kiểm tra tình trạng phòng</h5>
+                    <p class="text-muted small">Chọn ngày để xem phòng còn trống không</p>
+
+                    <div class="date-picker-group">
+                        <div style="flex:1">
+                            <label class="form-label">Check In</label>
+                            <input type="date" id="checkInDate" class="form-control"
+                                   min="@DateTime.Today.ToString("yyyy-MM-dd")" />
+                        </div>
+                        <div style="flex:1">
+                            <label class="form-label">Check Out</label>
+                            <input type="date" id="checkOutDate" class="form-control"
+                                   min="@DateTime.Today.ToString("yyyy-MM-dd")" />
+                        </div>
+                    </div>
+
+                    <div id="availabilityResult"></div>
+
+                    <!-- NÚT ĐẶT PHÒNG ĐỘNG -->
+                    <button id="btnBookNow" class="btn btn-success btn-book w-100 mt-3" style="display: none;">
+                        <i class="fas fa-calendar-check"></i> Đặt phòng ngay
+                    </button>
+
+                    <button id="btnBookDisabled" class="btn btn-secondary btn-book w-100 mt-3"
+                            style="display: none; background:#dc3545; color:white;" disabled>
+                        ❌ Phòng đã được đặt trong khoảng thời gian này
+                    </button>
                 </div>
             </div>
-
         </div>
     </div>
 </div>
@@ -747,4 +820,89 @@
         sendBtn.disabled = false;
         input.focus();
     }
+</script>
+<<script>
+     const roomId = @Model.Id;
+
+     async function checkAvailability() {
+         const checkIn = document.getElementById("checkInDate").value;
+         const checkOut = document.getElementById("checkOutDate").value;
+         const resultDiv = document.getElementById("availabilityResult");
+         const btnBook = document.getElementById("btnBookNow");
+         const btnDisabled = document.getElementById("btnBookDisabled");
+
+         // === BAN ĐẦU HOẶC CHƯA CHỌN ĐỦ NGÀY → NÚT BỊ MỜ ===
+         if (!checkIn || !checkOut) {
+             resultDiv.innerHTML = "";
+             btnBook.style.display = "block";
+             btnBook.disabled = true;           // nút mờ
+             btnDisabled.style.display = "none";
+             return;
+         }
+
+         try {
+             const res = await fetch(`/Bookings/GetBookedRanges?roomId=${roomId}`);
+             const bookedRanges = await res.json();
+
+             const isBooked = bookedRanges.some(range => {
+                 const rangeIn = new Date(range.checkIn);
+                 const rangeOut = new Date(range.checkOut);
+                 const selIn = new Date(checkIn);
+                 const selOut = new Date(checkOut);
+                 return selIn < rangeOut && selOut > rangeIn;
+             });
+
+             if (isBooked) {
+                 // Trường hợp đã đặt
+                 resultDiv.innerHTML = `<div class="alert-booked">❌ Phòng đã được đặt trong khoảng thời gian này</div>`;
+                 btnBook.style.display = "block";
+                 btnBook.disabled = true;           // nút mờ
+                 btnDisabled.style.display = "none";
+             } else {
+                 // Trường hợp còn trống
+                 resultDiv.innerHTML = `<div class="alert-available">✅ Phòng còn trống! Bạn có thể đặt ngay.</div>`;
+                 btnBook.style.display = "block";
+                 btnBook.disabled = false;          // nút xanh rõ, nhấn được
+                 btnDisabled.style.display = "none";
+             }
+         } catch (e) {
+             resultDiv.innerHTML = `<div class="alert-booked">Lỗi kiểm tra phòng. Vui lòng thử lại.</div>`;
+             btnBook.style.display = "block";
+             btnBook.disabled = true;
+             btnDisabled.style.display = "none";
+         }
+     }
+
+     // Sự kiện thay đổi ngày
+     document.getElementById("checkInDate").addEventListener("change", () => {
+         const co = document.getElementById("checkOutDate");
+         if (co.value && co.value <= document.getElementById("checkInDate").value) co.value = "";
+         co.min = document.getElementById("checkInDate").value;
+         checkAvailability();
+     });
+
+     document.getElementById("checkOutDate").addEventListener("change", checkAvailability);
+
+     // Click nút Đặt phòng (chỉ hoạt động khi nút không bị disable)
+     document.getElementById("btnBookNow").addEventListener("click", () => {
+         if (document.getElementById("btnBookNow").disabled) return;
+
+         const ci = document.getElementById("checkInDate").value;
+         const co = document.getElementById("checkOutDate").value;
+         if (!ci || !co) {
+             alert("Vui lòng chọn ngày Check In và Check Out");
+             return;
+         }
+         window.location.href = `/Bookings/BookRoom?roomId=${roomId}&checkIn=${ci}&checkOut=${co}`;
+     });
+
+     // Khởi tạo
+     const today = new Date().toISOString().split('T')[0];
+     document.getElementById("checkInDate").min = today;
+     document.getElementById("checkOutDate").min = today;
+
+     // Ban đầu: nút mờ đi
+     document.getElementById("btnBookNow").style.display = "block";
+     document.getElementById("btnBookNow").disabled = true;
+     document.getElementById("btnBookDisabled").style.display = "none";
 </script>

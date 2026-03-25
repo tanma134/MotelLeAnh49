@@ -7,12 +7,15 @@
 
 <div class="container mt-5">
     <div class="card shadow-lg border-0">
+
         <div class="card-header bg-dark text-white">
             <h4 class="mb-0">
                 <i class="fas fa-calendar-check"></i> Đặt phòng
             </h4>
         </div>
+
         <div class="card-body">
+
             @if (TempData["Error"] != null)
             {
                 <div class="alert alert-danger">
@@ -21,54 +24,60 @@
             }
 
             <form asp-action="BookRoom" method="post" id="bookingForm">
+
                 <input type="hidden" asp-for="RoomId" value="@ViewBag.RoomId" />
 
                 <div class="row">
+
                     <div class="col-md-6 mb-3">
-                        <label asp-for="FullName" class="form-label"></label>
+                        <label>Full Name</label>
                         <input asp-for="FullName" class="form-control" id="fullname" />
                         <small class="text-danger" id="nameError"></small>
                     </div>
 
                     <div class="col-md-6 mb-3">
-                        <label asp-for="Phone" class="form-label"></label>
+                        <label>Phone</label>
                         <input asp-for="Phone" class="form-control" id="phone" />
                         <small class="text-danger" id="phoneError"></small>
                     </div>
 
                     <div class="col-md-6 mb-3">
-                        <label asp-for="Email" class="form-label"></label>
+                        <label>Email</label>
                         <input asp-for="Email" class="form-control" id="email" />
                         <small class="text-danger" id="emailError"></small>
                     </div>
 
                     <div class="col-md-3 mb-3">
-                        <label asp-for="Adults" class="form-label"></label>
-                        <input asp-for="Adults" type="number" class="form-control" min="1" value="2" />
+                        <label>Adults</label>
+                        <input asp-for="Adults" type="number" class="form-control" min="1" value="2" id="adults" />
                     </div>
 
                     <div class="col-md-3 mb-3">
-                        <label asp-for="Children" class="form-label"></label>
-                        <input asp-for="Children" type="number" class="form-control" min="0" value="0" />
+                        <label>Children</label>
+                        <input asp-for="Children" type="number" class="form-control" min="0" value="0" id="children" />
                     </div>
 
+                    <!-- 🔥 CALENDAR XỊN -->
                     <div class="col-md-6 mb-3">
-                        <label asp-for="CheckIn" class="form-label"></label>
-                        <input asp-for="CheckIn" type="date" class="form-control" id="checkin" />
+                        <label>Check In (14:00)</label>
+                        <input asp-for="CheckIn" type="text" class="form-control" id="checkin" />
                         <small class="text-danger" id="checkinError"></small>
                     </div>
 
                     <div class="col-md-6 mb-3">
-                        <label asp-for="CheckOut" class="form-label"></label>
-                        <input asp-for="CheckOut" type="date" class="form-control" id="checkout" />
+                        <label>Check Out (12:00)</label>
+                        <input asp-for="CheckOut" type="text" class="form-control" id="checkout" />
                         <small class="text-danger" id="checkoutError"></small>
                     </div>
+
                 </div>
 
                 <button type="submit" class="btn btn-success w-100 mt-3" id="submitBtn" disabled>
                     <i class="fas fa-check-circle"></i> Xác nhận đặt phòng
                 </button>
+
             </form>
+
         </div>
     </div>
 </div>
@@ -78,8 +87,53 @@
         opacity: 0.5;
         cursor: not-allowed;
     }
+
+    .flatpickr-day {
+        border-radius: 6px;
+    }
 </style>
 
 @section Scripts {
-    <script src="~/js/booking-form-validation.js"></script>
+
+    <!-- 🔥 FLATPICKR -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+
+    <!-- JS CŨ -->
+    <script src="~/js/book-room.js"></script>
+
+    <!-- 🔥 JS MỚI -->
+    <script>
+        document.addEventListener("DOMContentLoaded", async function () {
+
+            const roomId = document.querySelector("input[name='RoomId']").value;
+
+            const res = await fetch(`/Bookings/GetBookedRanges?roomId=${roomId}`);
+            const booked = await res.json();
+
+            const disabledRanges = booked.map(b => ({
+                from: b.checkIn.split("T")[0],
+                to: b.checkOut.split("T")[0]
+            }));
+
+            const checkIn = document.getElementById("checkin");
+            const checkOut = document.getElementById("checkout");
+
+            const fpCheckIn = flatpickr(checkIn, {
+                dateFormat: "Y-m-d",
+                minDate: "today",
+                disable: disabledRanges,
+                onChange: function (dates) {
+                    fpCheckOut.set("minDate", dates[0]);
+                }
+            });
+
+            const fpCheckOut = flatpickr(checkOut, {
+                dateFormat: "Y-m-d",
+                minDate: "today",
+                disable: disabledRanges
+            });
+
+        });
+    </script>
 }

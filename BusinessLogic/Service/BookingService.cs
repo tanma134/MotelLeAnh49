@@ -1,5 +1,7 @@
-﻿using MotelLeAnh49.Models;
+﻿using BusinessLogic.Interfaces;
+using BusinessLogic.Service;
 using DataAccess.Repositories;
+using MotelLeAnh49.Models;
 using System.Text.RegularExpressions;
 
 namespace BusinessLogic.Service
@@ -7,17 +9,24 @@ namespace BusinessLogic.Service
     public class BookingService : IBookingService
     {
         private readonly IBookingRepository _bookingRepo;
+        private readonly IRoomRepository _roomRepo;
+        private readonly EmailService _emailService;
 
-        public BookingService(IBookingRepository bookingRepo)
+        public BookingService(
+            IBookingRepository bookingRepo,
+            IRoomRepository roomRepo,
+            EmailService emailService)
         {
             _bookingRepo = bookingRepo;
+            _roomRepo = roomRepo;
+            _emailService = emailService;
         }
 
-        // ===============================
-        // VALIDATE BOOKING
-        // ===============================
+        // ──────────────────────────────────────────
+        // VALIDATE
+        // ──────────────────────────────────────────
 
-        public string ValidateBooking(Booking booking)
+        public string? ValidateBooking(Booking booking)
         {
             if (string.IsNullOrWhiteSpace(booking.FullName))
                 return "Vui lòng nhập họ tên";
@@ -43,87 +52,137 @@ namespace BusinessLogic.Service
             if (booking.Adults <= 0)
                 return "Phải có ít nhất 1 người lớn";
 
+            var room = _roomRepo.GetById(booking.RoomId);
+            if (room == null)
+                return "Phòng không tồn tại";
+
+            int total = booking.Adults + booking.Children;
+
+            if (booking.Adults > room.MaxGuests)
+                return $"Phòng chỉ cho tối đa {room.MaxGuests} người lớn";
+
+            if (total > room.MaxGuests + 1)
+                return $"Phòng tối đa {room.MaxGuests + 1} người";
+
             return null;
         }
 
-        // ===============================
-        // GET ALL BOOKINGS
-        // ===============================
+        // ──────────────────────────────────────────
+        // GET
+        // ──────────────────────────────────────────
 
-        public List<Booking> GetAll()
-        {
-            return _bookingRepo.GetAll().ToList();
-        }
+        public List<Booking> GetAll() =>
+            _bookingRepo.GetAll().ToList();
 
-        // ===============================
-        // GET BOOKING BY ID
-        // ===============================
+        public Booking? GetById(int id) =>
+            _bookingRepo.GetById(id);
 
-        public Booking GetById(int id)
-        {
-            return _bookingRepo.GetById(id);
-        }
-
-        // ===============================
-        // GET BOOKINGS BY CUSTOMER
-        // ===============================
-
-        public List<Booking> GetByCustomerId(int customerId)
-        {
-            return _bookingRepo.GetAll()
+        public List<Booking> GetByCustomerId(int customerId) =>
+            _bookingRepo.GetAll()
                 .Where(b => b.CustomerId == customerId)
                 .OrderByDescending(b => b.CreatedAt)
                 .ToList();
-        }
 
-        // ===============================
-        // CREATE BOOKING
-        // ===============================
+        // ──────────────────────────────────────────
+        // CREATE
+        // ──────────────────────────────────────────
 
-        public void Create(Booking booking)
+        public async Task CreateAsync(Booking booking)
         {
             _bookingRepo.Add(booking);
             _bookingRepo.Save();
+
+            if (!string.IsNullOrEmpty(booking.Email))
+            {
+                var body = _emailService.BuildBookingTemplate("🎉 Booking Created", booking, "orange");
+                await _emailService.SendEmailAsync(booking.Email, "Đặt phòng thành công", body);
+            }
         }
 
-        // ===============================
-        // UPDATE BOOKING
-        // ===============================
+        // ──────────────────────────────────────────
+        // UPDATE
+        // ──────────────────────────────────────────
 
-        public void Update(Booking booking)
+        public async Task UpdateAsync(Booking booking)
         {
-            _bookingRepo.Update(booking);
-            _bookingRepo.Save();
+            var old = _bookingRepo.GetById(booking.Id);
+            if (old == null) return;
+
+            var oldStatus = old.Status;
+
+            // 🔥 UPDATE TRÊN ENTITY CŨ (EF TRACKING)
+            old.FullName = booking.FullName;
+            old.Phone = booking.Phone;
+            old.Email = booking.Email;
+            old.RoomId = booking.RoomId;
+            old.Status = booking.Status;
+            old.CheckIn = booking.CheckIn;
+            old.CheckOut = booking.CheckOut;
+            old.Adults = booking.Adults;
+            old.Children = booking.Children;
+
+            _bookingRepo.Save(); // đủ rồi, KHÔNG cần Update()
+
+            // ================= EMAIL =================
+            bool statusChanged = oldStatus != old.Status;
+
+            if ((statusChanged || !string.IsNullOrEmpty(old.Email)) && !string.IsNullOrEmpty(old.Email))
+            {
+                string title;
+                string color;
+
+                if (statusChanged)
+                {
+                    (title, color) = old.Status switch
+                    {
+                        "Confirmed" => ("✅ Booking Confirmed", "green"),
+                        "Cancelled" => ("❌ Booking Cancelled", "red"),
+                        "Pending" => ("⏳ Booking Pending", "orange"),
+                        _ => ($"📝 Booking Updated - {old.Status}", "blue")
+                    };
+                }
+                else
+                {
+                    title = "📝 Booking Information Updated";
+                    color = "blue";
+                }
+
+                try
+                {
+                    var body = _emailService.BuildBookingTemplate(title, old, color);
+                    await _emailService.SendEmailAsync(old.Email, title, body);
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"Send email failed: {ex.Message}");
+                }
+            }
         }
 
-        // ===============================
-        // DELETE BOOKING
-        // ===============================
+        // ──────────────────────────────────────────
+        // DELETE
+        // ──────────────────────────────────────────
 
         public void Delete(int id)
         {
             var booking = _bookingRepo.GetById(id);
+            if (booking == null) return;
 
-            if (booking != null)
-            {
-                _bookingRepo.Delete(id);
-                _bookingRepo.Save();
-            }
+            _bookingRepo.Delete(id);
+            _bookingRepo.Save();
         }
 
-        // ===============================
-        // CHECK ROOM AVAILABLE
-        // ===============================
+        // ──────────────────────────────────────────
+        // CHECK AVAILABILITY
+        // ──────────────────────────────────────────
 
-        public bool IsRoomAvailable(int roomId, DateTime checkIn, DateTime checkOut, int? ignoreBookingId = null)
-        {
-            return !_bookingRepo.GetAll().Any(b =>
+        public bool IsRoomAvailable(int roomId, DateTime checkIn, DateTime checkOut, int? ignoreBookingId = null) =>
+            !_bookingRepo.GetAll().Any(b =>
                 b.RoomId == roomId &&
                 b.Status != "Cancelled" &&
                 (ignoreBookingId == null || b.Id != ignoreBookingId) &&
                 checkIn < b.CheckOut &&
                 checkOut > b.CheckIn
             );
-        }
     }
 }

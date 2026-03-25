@@ -24,6 +24,9 @@
         border-radius: 6px;
         text-decoration: none;
         font-weight: 600;
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
     }
 
     table {
@@ -31,6 +34,8 @@
         border-collapse: collapse;
         background: white;
         box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        border-radius: 8px;
+        overflow: hidden;
     }
 
     thead {
@@ -81,18 +86,65 @@
             background: #3498db;
             color: white;
         }
+
+    .input-group:focus-within {
+        border: 1px solid #3498db;
+    }
+
+    .input-group .btn-primary {
+        background: linear-gradient(135deg, #3498db 0%, #2980b9 100%);
+        border: none;
+        transition: all 0.3s ease;
+    }
+
+        .input-group .btn-primary:hover {
+            filter: brightness(1.1);
+            transform: scale(1.02);
+        }
 </style>
 
-<div class="container">
+<div class="container py-4">
 
     <h2>📋 Booking List</h2>
 
-    <p>
-        <a asp-action="Create" class="btn-add">➕ Create Booking</a>
-    </p>
+    <div class="d-flex justify-content-between align-items-center mb-3">
+
+        <div>
+            <a asp-action="Create" class="btn-add">
+                ➕ Create Booking
+            </a>
+        </div>
+
+        <div style="flex: 1; max-width: 500px;">
+            <div class="input-group shadow-sm" style="border-radius: 10px; overflow: hidden;">
+
+                <span class="input-group-text bg-white border-end-0">
+                    🔍
+                </span>
+
+                <input type="text"
+                       id="searchBox"
+                       class="form-control border-start-0 ps-0"
+                       placeholder="Search name or phone..."
+                       style="box-shadow: none; height: 45px;" />
+
+                <select id="statusFilter" class="form-control" style="max-width:120px;">
+                    <option value="">All</option>
+                    <option value="Pending">Pending</option>
+                    <option value="Confirmed">Confirmed</option>
+                    <option value="Cancelled">Cancelled</option>
+                </select>
+
+                <button class="btn btn-primary px-4" style="height: 45px;">
+                    Search
+                </button>
+
+            </div>
+        </div>
+
+    </div>
 
     <table>
-
         <thead>
             <tr>
                 <th>Customer</th>
@@ -106,7 +158,7 @@
             </tr>
         </thead>
 
-        <tbody>
+        <tbody id="bookingTable">
 
             @foreach (var b in Model)
             {
@@ -119,12 +171,11 @@
                     <td>@b.CheckOut.ToString("dd/MM/yyyy")</td>
 
                     <td>
-
-                        @if (b.Status=="Pending")
+                        @if (b.Status == "Pending")
                         {
                             <span class="badge pending">Pending</span>
                         }
-                        else if (b.Status=="Confirmed")
+                        else if (b.Status == "Confirmed")
                         {
                             <span class="badge confirmed">Confirmed</span>
                         }
@@ -132,7 +183,6 @@
                         {
                             <span class="badge cancelled">Cancelled</span>
                         }
-
                     </td>
 
                     <td>
@@ -140,12 +190,101 @@
                            asp-route-id="@b.Id"
                            class="action-link">✏️ Edit</a>
                     </td>
-
                 </tr>
             }
 
         </tbody>
-
     </table>
 
 </div>
+
+<!-- REALTIME SEARCH -->
+<!-- REALTIME SEARCH + SIGNALR -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/7.0.5/signalr.min.js"></script>
+<script>
+    const searchBox = document.getElementById("searchBox");
+    const statusFilter = document.getElementById("statusFilter");
+    const tableBody = document.getElementById("bookingTable");
+
+    function loadData() {
+        const keyword = encodeURIComponent(searchBox.value.trim());
+        const status = encodeURIComponent(statusFilter.value);
+
+        fetch(`/Bookings/Search?keyword=${keyword}&status=${status}`)
+            .then(res => res.json())
+            .then(data => {
+                tableBody.innerHTML = "";
+
+                if (data.length === 0) {
+                    tableBody.innerHTML = `<tr><td colspan="8" class="text-center py-4">Không tìm thấy đặt phòng nào</td></tr>`;
+                    return;
+                }
+
+                data.forEach(b => {
+                    let badgeClass = "";
+                    let badgeText = "";
+
+                    if (b.status === "Pending") {
+                        badgeClass = "pending";
+                        badgeText = "Pending";
+                    } else if (b.status === "Confirmed") {
+                        badgeClass = "confirmed";
+                        badgeText = "Confirmed";
+                    } else {
+                        badgeClass = "cancelled";
+                        badgeText = "Cancelled";
+                    }
+
+                    tableBody.innerHTML += `
+                        <tr>
+                            <td>${b.fullName}</td>
+                            <td>${b.phone}</td>
+                            <td>${b.email}</td>
+                            <td>Room ${b.roomNumber}</td>
+                            <td>${b.checkIn}</td>
+                            <td>${b.checkOut}</td>
+                            <td><span class="badge ${badgeClass}">${badgeText}</span></td>
+                            <td>
+                                <a href="/Bookings/UpdateStatus/${b.id}" class="action-link">✏️ Edit</a>
+                            </td>
+                        </tr>
+                    `;
+                });
+            })
+            .catch(err => {
+                console.error("Search error:", err);
+                tableBody.innerHTML = `<tr><td colspan="8" class="text-center text-danger">Lỗi tải dữ liệu</td></tr>`;
+            });
+    }
+
+    // Event listeners
+    searchBox.addEventListener("keyup", debounce(loadData, 300));
+    statusFilter.addEventListener("change", loadData);
+
+    // SignalR
+    const connection = new signalR.HubConnectionBuilder()
+        .withUrl("/bookingHub")
+        .build();
+
+    connection.on("reloadBooking", loadData);
+
+    connection.start()
+        .then(() => console.log("SignalR connected successfully"))
+        .catch(err => console.error("SignalR error:", err));
+
+    // Debounce function
+    function debounce(func, wait) {
+        let timeout;
+        return function executedFunction(...args) {
+            const later = () => {
+                clearTimeout(timeout);
+                func(...args);
+            };
+            clearTimeout(timeout);
+            timeout = setTimeout(later, wait);
+        };
+    }
+
+    // Load lần đầu
+    window.onload = loadData;
+</script>
