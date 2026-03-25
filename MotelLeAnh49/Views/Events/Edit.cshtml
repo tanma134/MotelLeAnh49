@@ -10,7 +10,6 @@
         font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         background: #f5f7fa;
         margin: 0;
-        padding: 20px;
     }
 
     .form-container {
@@ -64,7 +63,13 @@
             box-shadow: 0 0 0 3px rgba(243, 156, 18, 0.1);
         }
 
-    .validation-error {
+        input.input-validation-error,
+        textarea.input-validation-error {
+            border-color: #e74c3c !important;
+            background: #fff8f8;
+        }
+
+    .field-validation-error {
         color: #e74c3c;
         font-size: 13px;
         margin-top: 5px;
@@ -78,6 +83,7 @@
         border-left: 4px solid #ffc107;
         border-radius: 8px;
         color: #856404;
+        display: none;
     }
 
     .button-group {
@@ -147,36 +153,36 @@
         @Html.AntiForgeryToken()
         <input type="hidden" asp-for="EventId" />
 
-        <div asp-validation-summary="All" class="validation-summary"></div>
+      
 
         <div class="form-group">
             <label asp-for="Title">Tiêu đề</label>
             <input asp-for="Title" placeholder="VD: Sự kiện khai trương" />
-            <span asp-validation-for="Title" class="validation-error"></span>
+            <span asp-validation-for="Title" class="field-validation-error"></span>
         </div>
 
         <div class="form-group">
             <label asp-for="Description">Mô tả</label>
             <textarea asp-for="Description" placeholder="Mô tả chi tiết sự kiện..."></textarea>
-            <span asp-validation-for="Description" class="validation-error"></span>
+            <span asp-validation-for="Description" class="field-validation-error"></span>
         </div>
 
         <div class="form-group">
             <label asp-for="Location">Địa điểm</label>
             <input asp-for="Location" placeholder="VD: Sảnh chính tầng 1" />
-            <span asp-validation-for="Location" class="validation-error"></span>
+            <span asp-validation-for="Location" class="field-validation-error"></span>
         </div>
 
         <div class="form-group">
             <label asp-for="City">Thành phố</label>
             <input asp-for="City" placeholder="VD: Hà Nội" />
-            <span asp-validation-for="City" class="validation-error"></span>
+            <span asp-validation-for="City" class="field-validation-error"></span>
         </div>
 
         <div class="form-group">
             <label asp-for="EventDate">Ngày giờ diễn ra</label>
             <input asp-for="EventDate" type="datetime-local" />
-            <span asp-validation-for="EventDate" class="validation-error"></span>
+            <span asp-validation-for="EventDate" class="field-validation-error"></span>
         </div>
 
         <div class="form-group">
@@ -184,25 +190,20 @@
             @if (!string.IsNullOrEmpty(Model.ImageUrl))
             {
                 <div class="current-image">
-                    <img src="@Model.ImageUrl" alt="Ảnh sự kiện" />
+                    <img src="@Model.ImageUrl" alt="Ảnh sự kiện" id="oldImage" />
                 </div>
             }
             else
             {
-                <p>Chưa có ảnh.</p>
+                <p style="color:#999; font-size:13px">Chưa có ảnh.</p>
             }
         </div>
 
         <div class="form-group">
-            <label>Thay ảnh mới (tùy chọn)</label>
+            <label>Thay ảnh mới <span style="color:#999; font-weight:400">(tuỳ chọn)</span></label>
             <input type="file" name="ImageFile" accept="image/*" />
             <small>Để trống nếu giữ ảnh hiện tại</small>
-        </div>
-
-        <div class="form-group">
-            <label asp-for="ImageUrl">Đường dẫn ảnh (URL)</label>
-            <input asp-for="ImageUrl" placeholder="/images/events/xxx.jpg" />
-            <span asp-validation-for="ImageUrl" class="validation-error"></span>
+            <img id="preview" style="width:120px; border-radius:8px; margin-top:10px; display:none;" />
         </div>
 
         <div class="button-group">
@@ -211,3 +212,36 @@
         </div>
     </form>
 </div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+
+    <script>
+        // Hiện summary nếu server trả về lỗi
+        const summary = document.querySelector(".validation-summary");
+        if (summary && summary.querySelector("li")) {
+            summary.style.display = "block";
+        }
+
+        // Hiện summary khi submit
+        document.querySelector("form").addEventListener("submit", function () {
+            if (summary) summary.style.display = "block";
+        });
+
+        // Preview ảnh mới, ẩn ảnh cũ
+        const fileInput = document.querySelector('input[name="ImageFile"]');
+        const preview = document.getElementById("preview");
+        const oldImage = document.getElementById("oldImage");
+
+        fileInput.addEventListener("change", function () {
+            const file = this.files[0];
+            if (file) {
+                preview.src = URL.createObjectURL(file);
+                preview.style.display = "block";
+                if (oldImage) oldImage.style.display = "none";
+            }
+        });
+    </script>
+}

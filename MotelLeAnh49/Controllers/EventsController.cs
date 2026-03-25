@@ -66,6 +66,10 @@ namespace MotelLeAnh49.Controllers
             if (!IsAdmin())
                 return RedirectToAction("Login", "Admin");
 
+            // ── Validate ngày không được ở quá khứ ──
+            if (ev.EventDate <= DateTime.Now)
+                ModelState.AddModelError("EventDate", "⚠️ Ngày giờ diễn ra phải ở tương lai.");
+
             if (!ModelState.IsValid)
                 return View(ev);
 
@@ -112,8 +116,17 @@ namespace MotelLeAnh49.Controllers
             if (!IsAdmin())
                 return RedirectToAction("Login", "Admin");
 
+            // ── Validate ngày không được ở quá khứ ──
+            if (ev.EventDate <= DateTime.Now)
+                ModelState.AddModelError("EventDate", "⚠️ Ngày giờ diễn ra phải ở tương lai.");
+
             if (!ModelState.IsValid)
+            {
+                // giữ lại ảnh cũ khi validate fail
+                var existing2 = _eventService.GetEventById(ev.EventId);
+                ev.ImageUrl = existing2?.ImageUrl;
                 return View(ev);
+            }
 
             var existing = _eventService.GetEventById(ev.EventId);
             if (existing == null)

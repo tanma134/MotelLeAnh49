@@ -101,5 +101,24 @@ namespace BusinessLogic.Service
                 _repo.Save();
             }
         }
+        public bool IsPhoneExist(string phone)
+        {
+            if (string.IsNullOrWhiteSpace(phone))
+                return false;
+
+            phone = phone.Trim();
+
+            return _context.Customers.Any(c => c.Phone == phone);
+        }
+
+        public bool IsIdentityExist(string identity)
+        {
+            if (string.IsNullOrWhiteSpace(identity))
+                return false;
+
+            identity = identity.Trim();
+
+            return _context.Customers.Any(c => c.IdentityNumber == identity);
+        }
     }
 }

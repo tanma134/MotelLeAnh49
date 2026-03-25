@@ -88,5 +88,11 @@ namespace BusinessLogic.Services
             var services = _bookingServiceRepository.GetByBookingId(bookingId);
             return services.Sum(s => s.PriceAtBooking * s.Quantity);
         }
+        public bool IsNameDuplicate(string name, int? excludeId = null)
+        {
+            return _serviceItemRepository.GetAll()
+                .Any(s => s.Name.Trim().ToLower() == name.Trim().ToLower()
+                       && (excludeId == null || s.ServiceItemId != excludeId));
+        }
     }
 }

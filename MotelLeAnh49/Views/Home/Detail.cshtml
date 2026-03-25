@@ -57,6 +57,74 @@
         margin: 30px 0;
     }
 
+    /* Price table */
+    .price-table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 10px;
+    }
+
+        .price-table th,
+        .price-table td {
+            padding: 10px 14px;
+            border: 1px solid #e8e0cc;
+            font-size: 14px;
+        }
+
+        .price-table th {
+            background: #fdf6e3;
+            font-weight: 600;
+            color: #7a5c1a;
+            width: 55%;
+        }
+
+        .price-table td {
+            text-align: right;
+            font-weight: 500;
+            color: #333;
+        }
+
+        .price-table tr:last-child td,
+        .price-table tr:last-child th {
+            border-bottom: none;
+        }
+
+    /* Info badges */
+    .info-badge-row {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        margin: 18px 0;
+    }
+
+    .info-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 7px 14px;
+        border-radius: 20px;
+        font-size: 13px;
+        font-weight: 500;
+        background: #fdf6e3;
+        border: 1px solid #e8d8a0;
+        color: #7a5c1a;
+    }
+
+        .info-badge i {
+            font-size: 15px;
+        }
+
+    .section-title {
+        font-size: 16px;
+        font-weight: 700;
+        color: #555;
+        text-transform: uppercase;
+        letter-spacing: .05em;
+        margin: 22px 0 10px;
+        padding-bottom: 6px;
+        border-bottom: 2px solid #f0e6c0;
+    }
+
     .booking-sidebar {
         position: sticky;
         top: 100px;
@@ -68,6 +136,27 @@
         border-radius: 10px;
         box-shadow: 0 10px 30px rgba(0,0,0,0.15);
     }
+
+        .booking-card .price-summary {
+            margin-bottom: 20px;
+        }
+
+        .booking-card .price-row {
+            display: flex;
+            justify-content: space-between;
+            font-size: 13px;
+            padding: 6px 0;
+            border-bottom: 1px dashed #eee;
+            color: #555;
+        }
+
+            .booking-card .price-row:last-child {
+                border-bottom: none;
+                font-weight: 700;
+                font-size: 15px;
+                color: #333;
+                margin-top: 4px;
+            }
 
     /* ====== FLOATING CHAT WIDGET ====== */
     #chat-fab {
@@ -308,17 +397,15 @@
             .cx-typing-dots span:nth-child(3) {
                 animation-delay: .4s;
             }
+
     @@keyframes cxBlink {
-        0%,80%,100%
+        0%, 80%, 100% {
+            opacity: .2
+        }
 
-    {
-        opacity: .2
-    }
-
-    40% {
-        opacity: 1
-    }
-
+        40% {
+            opacity: 1
+        }
     }
 
     .cx-composer {
@@ -407,6 +494,7 @@
     <div class="container">
         <div class="row">
 
+            <!-- ── Cột trái: ảnh + thông tin ── -->
             <div class="col-lg-8">
                 <img id="mainImage"
                      src="@(Model?.RoomImages?.FirstOrDefault()?.ImagePath ?? "https://images.unsplash.com/photo-1611892440504-42a792e24d32?w=1200")"
@@ -422,16 +510,86 @@
 
                 <div class="room-info mt-3">
                     <h1>Phòng @Model?.RoomNumber</h1>
-                    <p>@Model?.RoomType</p>
+                    <p class="text-muted mb-0">@Model?.RoomType</p>
+
+                    <!-- Badges thông tin nhanh -->
+                    <div class="info-badge-row">
+                        <span class="info-badge">
+                            👥 Tối đa @Model?.MaxGuests khách
+                        </span>
+                        @if (Model?.ExtraGuestFee > 0)
+                        {
+                            <span class="info-badge">
+                                ➕ Phụ thu thêm người: @Model.ExtraGuestFee.ToString("N0") đ
+                            </span>
+                        }
+                    </div>
+
+                    <!-- Bảng giá -->
+                    <div class="section-title">Bảng giá</div>
 
                     <div class="price-box">
-                        @(Model?.OvernightPrice.ToString("N0")) đ / đêm
+                        <div style="font-size:13px; opacity:.85; margin-bottom:4px;">Giá qua đêm</div>
+                        <div style="font-size:26px; font-weight:700;">@Model?.OvernightPrice.ToString("N0") đ</div>
                     </div>
+
+                    <table class="price-table">
+                        <tbody>
+                            <tr>
+                                <th>🌙 Giá qua đêm</th>
+                                <td>@Model?.OvernightPrice.ToString("N0") đ</td>
+                            </tr>
+                            <tr>
+                                <th>☀️ Giá theo ngày</th>
+                                <td>@Model?.DayPrice.ToString("N0") đ</td>
+                            </tr>
+                            <tr>
+                                <th>⏱ Giá giờ đầu</th>
+                                <td>@Model?.FirstHourPrice.ToString("N0") đ</td>
+                            </tr>
+                            <tr>
+                                <th>⏱ Giá mỗi giờ tiếp theo</th>
+                                <td>@Model?.NextHourPrice.ToString("N0") đ</td>
+                            </tr>
+                            @if (Model?.ExtraGuestFee > 0)
+                            {
+                                <tr>
+                                    <th>👤 Phụ thu thêm người</th>
+                                    <td>@Model.ExtraGuestFee.ToString("N0") đ / người</td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
                 </div>
             </div>
 
+            <!-- ── Cột phải: sidebar đặt phòng ── -->
             <div class="col-lg-4">
                 <div class="booking-card booking-sidebar">
+
+                    <div class="price-summary">
+                        <div class="price-row">
+                            <span>🌙 Qua đêm</span>
+                            <span>@Model?.OvernightPrice.ToString("N0") đ</span>
+                        </div>
+                        <div class="price-row">
+                            <span>☀️ Theo ngày</span>
+                            <span>@Model?.DayPrice.ToString("N0") đ</span>
+                        </div>
+                        <div class="price-row">
+                            <span>⏱ Giờ đầu</span>
+                            <span>@Model?.FirstHourPrice.ToString("N0") đ</span>
+                        </div>
+                        <div class="price-row">
+                            <span>⏱ Giờ tiếp</span>
+                            <span>@Model?.NextHourPrice.ToString("N0") đ / giờ</span>
+                        </div>
+                        <div class="price-row">
+                            <span>👥 Khách tối đa</span>
+                            <span>@Model?.MaxGuests người</span>
+                        </div>
+                    </div>
+
                     <a asp-controller="Bookings"
                        asp-action="BookRoom"
                        asp-route-roomId="@Model.Id"
@@ -446,7 +604,6 @@
 </div>
 
 <!-- ====== FLOATING CHAT WIDGET ====== -->
-<!-- Nút FAB -->
 <button id="chat-fab" onclick="cxToggle()" title="Chat hỗ trợ">
     <svg viewBox="0 0 24 24">
         <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
@@ -454,10 +611,7 @@
     <span id="chat-badge">1</span>
 </button>
 
-<!-- Cửa sổ chat -->
 <div id="chat-box">
-
-    <!-- Header -->
     <div class="cx-header">
         <div class="cx-icon">&#9768;</div>
         <div>
@@ -468,7 +622,6 @@
         <button class="cx-close-btn" onclick="cxToggle()" title="Đóng">&#x2715;</button>
     </div>
 
-    <!-- Tin nhắn -->
     <div class="cx-msgs" id="cx-msgs">
         <div class="cx-msg ai">
             <div class="cx-lbl">Concierge IA</div>
@@ -476,7 +629,6 @@
         </div>
     </div>
 
-    <!-- Ô nhập -->
     <div class="cx-composer">
         @Html.AntiForgeryToken()
         <textarea id="cx-input" rows="1" placeholder="Hỏi về phòng, giá, dịch vụ…"></textarea>
@@ -487,16 +639,13 @@
             </svg>
         </button>
     </div>
-
 </div>
 
 <script>
-    // ── Đổi ảnh chính ──
     function changeMainImage(src) {
         document.getElementById('mainImage').src = src;
     }
 
-    // ── Chat Widget ──
     let cxIsOpen = false;
 
     function cxToggle() {
@@ -508,13 +657,11 @@
         }
     }
 
-    // Auto-resize textarea
     document.getElementById('cx-input').addEventListener('input', function () {
         this.style.height = 'auto';
         this.style.height = Math.min(this.scrollHeight, 110) + 'px';
     });
 
-    // Gửi bằng Enter (Shift+Enter = xuống dòng)
     document.getElementById('cx-input').addEventListener('keydown', function (e) {
         if (e.key === 'Enter' && !e.shiftKey) {
             e.preventDefault();

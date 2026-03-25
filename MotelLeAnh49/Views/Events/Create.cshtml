@@ -10,7 +10,6 @@
         font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         background: #f5f7fa;
         margin: 0;
-        padding: 20px;
     }
 
     .form-container {
@@ -64,6 +63,12 @@
             box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
         }
 
+        input.input-validation-error,
+        textarea.input-validation-error {
+            border-color: #e74c3c !important;
+            background: #fff8f8;
+        }
+
     .button-group {
         margin-top: 30px;
         display: flex;
@@ -107,74 +112,63 @@
             transform: translateY(-2px);
         }
 
-    .validation-error {
+    .field-validation-error {
         color: #e74c3c;
         font-size: 13px;
         margin-top: 5px;
         display: block;
     }
 
-    .validation-summary {
-        background: #fff3cd;
-        padding: 15px;
-        margin-bottom: 20px;
-        border-left: 4px solid #ffc107;
-        border-radius: 8px;
-        color: #856404;
-    }
-
-    small {
-        color: #7f8c8d;
-        font-size: 12px;
-    }
 </style>
 
 <div class="form-container">
     <h2>➕ Thêm sự kiện mới</h2>
 
     <form asp-action="Create" method="post" enctype="multipart/form-data">
-        <div asp-validation-summary="All" class="validation-summary"></div>
+        @Html.AntiForgeryToken()
+
+        
 
         <div class="form-group">
             <label asp-for="Title">Tiêu đề</label>
-            <input asp-for="Title" placeholder="VD: Sự kiện khai trương" required />
-            <span asp-validation-for="Title" class="validation-error"></span>
+            <input asp-for="Title" placeholder="VD: Sự kiện khai trương" />
+            <span asp-validation-for="Title" class="field-validation-error"></span>
         </div>
 
         <div class="form-group">
             <label asp-for="Description">Mô tả</label>
-            <textarea asp-for="Description" placeholder="Mô tả chi tiết sự kiện..." required></textarea>
-            <span asp-validation-for="Description" class="validation-error"></span>
+            <textarea asp-for="Description" placeholder="Mô tả chi tiết sự kiện..."></textarea>
+            <span asp-validation-for="Description" class="field-validation-error"></span>
         </div>
 
         <div class="form-group">
             <label asp-for="Location">Địa điểm</label>
-            <input asp-for="Location" placeholder="VD: Sảnh chính tầng 1" required />
-            <span asp-validation-for="Location" class="validation-error"></span>
+            <input asp-for="Location" placeholder="VD: Sảnh chính tầng 1" />
+            <span asp-validation-for="Location" class="field-validation-error"></span>
         </div>
 
         <div class="form-group">
             <label asp-for="City">Thành phố</label>
-            <input asp-for="City" placeholder="VD: Hà Nội" required />
-            <span asp-validation-for="City" class="validation-error"></span>
+            <input asp-for="City" placeholder="VD: Hà Nội" />
+            <span asp-validation-for="City" class="field-validation-error"></span>
         </div>
 
         <div class="form-group">
             <label asp-for="EventDate">Ngày giờ diễn ra</label>
-            <input asp-for="EventDate" type="datetime-local" required />
-            <span asp-validation-for="EventDate" class="validation-error"></span>
+            <input asp-for="EventDate" type="datetime-local" />
+            <span asp-validation-for="EventDate" class="field-validation-error"></span>
         </div>
 
         <div class="form-group">
             <label>Ảnh sự kiện</label>
             <input type="file" name="ImageFile" accept="image/*" />
-            <small>Hoặc nhập đường dẫn ảnh bên dưới</small>
-        </div>
-
-        <div class="form-group">
-            <label asp-for="ImageUrl">Đường dẫn ảnh (URL)</label>
-            <input asp-for="ImageUrl" placeholder="/images/events/xxx.jpg hoặc để trống nếu chọn file" />
-            <span asp-validation-for="ImageUrl" class="validation-error"></span>
+            @if (ViewData.ModelState["ImageFile"]?.Errors.Count > 0)
+            {
+                <span class="field-validation-error">
+                    @ViewData.ModelState["ImageFile"]!.Errors[0].ErrorMessage
+                </span>
+            }
+            <img id="preview" style="width:120px; border-radius:8px; margin-top:10px; display:none;" />
         </div>
 
         <div class="button-group">
@@ -183,3 +177,33 @@
         </div>
     </form>
 </div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+
+    <script>
+        // Hiện validation summary khi có lỗi từ server
+        const summary = document.querySelector(".validation-summary");
+        if (summary && summary.querySelector("li")) {
+            summary.style.display = "block";
+        }
+
+        // Preview ảnh
+        const fileInput = document.querySelector('input[name="ImageFile"]');
+        const preview = document.getElementById("preview");
+        fileInput.addEventListener("change", function () {
+            const file = this.files[0];
+            if (file) {
+                preview.src = URL.createObjectURL(file);
+                preview.style.display = "block";
+            }
+        });
+
+        // Hiện summary khi submit
+        document.querySelector("form").addEventListener("submit", function () {
+            if (summary) summary.style.display = "block";
+        });
+    </script>
+}

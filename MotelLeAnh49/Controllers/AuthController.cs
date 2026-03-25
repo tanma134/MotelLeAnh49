@@ -58,7 +58,6 @@ namespace MotelLeAnh49.Controllers
 
         // REGISTER
         [HttpPost]
-        [HttpPost]
         public IActionResult Register(Account account, Customer customer)
         {
             if (_authService.IsUsernameExist(account.Username))
@@ -72,6 +71,26 @@ namespace MotelLeAnh49.Controllers
                 ViewBag.Error = "Email đã được sử dụng";
                 return View();
             }
+
+            // ✅ CHECK PHONE
+            if (!string.IsNullOrWhiteSpace(customer.Phone)
+                && _authService.IsPhoneExist(customer.Phone))
+            {
+                ViewBag.Error = "Số điện thoại đã được sử dụng";
+                return View();
+            }
+
+            // ✅ CHECK CCCD / CMND
+            if (!string.IsNullOrWhiteSpace(customer.IdentityNumber)
+                && _authService.IsIdentityExist(customer.IdentityNumber))
+            {
+                ViewBag.Error = "CMND/CCCD đã tồn tại";
+                return View();
+            }
+
+            // 🔥 Normalize nhẹ (tránh lỗi space)
+            customer.Phone = customer.Phone?.Trim();
+            customer.IdentityNumber = customer.IdentityNumber?.Trim();
 
             string otp = _authService.GenerateOTP();
 

@@ -125,36 +125,58 @@ namespace MotelLeAnh49.Controllers
 
             if (id != customer.Id) return NotFound();
 
+            // Validate basic
             if (string.IsNullOrEmpty(customer.Phone))
-                ModelState.AddModelError("Phone", "Phone is require");
+                ModelState.AddModelError("Phone", "Phone is required");
 
             if (string.IsNullOrEmpty(customer.IdentityNumber))
-                ModelState.AddModelError("IdentityNumber", "IdentityNumber is require");
+                ModelState.AddModelError("IdentityNumber", "IdentityNumber is required");
 
-            if (ModelState.IsValid)
+            // 🔥 Normalize
+            customer.Phone = customer.Phone?.Trim();
+            customer.IdentityNumber = customer.IdentityNumber?.Trim();
+
+            // 🔥 CHECK TRÙNG (QUAN TRỌNG)
+            var existingPhone = _customerService.GetAllCustomers()
+                .FirstOrDefault(c => c.Phone == customer.Phone && c.Id != customer.Id);
+
+            if (existingPhone != null)
             {
-                try
-                {
-                    _customerService.UpdateCustomer(customer);
-                    TempData["Success"] = "Cập nhật thành công!";
-                    return RedirectToAction(nameof(Index));
-                }
-                catch (Exception ex)
-                {
-                    string msg = ex.Message;
-
-                    if (msg.Contains("Phone"))
-                        ModelState.AddModelError("Phone", "Phone Number exists");
-                    else if (msg.Contains("Identity"))
-                        ModelState.AddModelError("IdentityNumber", "Identity Number exists");
-                    else if (msg.Contains("Email"))
-                        ModelState.AddModelError("Email", "This email address has already been registered!");
-                    else
-                        ModelState.AddModelError("", "Lỗi hệ thống: " + msg);
-                }
+                ModelState.AddModelError("Phone", "Số điện thoại đã tồn tại");
             }
 
-            return View(customer);
+            var existingIdentity = _customerService.GetAllCustomers()
+                .FirstOrDefault(c => c.IdentityNumber == customer.IdentityNumber && c.Id != customer.Id);
+
+            if (existingIdentity != null)
+            {
+                ModelState.AddModelError("IdentityNumber", "CMND/CCCD đã tồn tại");
+            }
+
+            if (!ModelState.IsValid)
+                return View(customer);
+
+            try
+            {
+                _customerService.UpdateCustomer(customer);
+                TempData["Success"] = "Cập nhật thành công!";
+                return RedirectToAction(nameof(Index));
+            }
+            catch (Exception ex)
+            {
+                string msg = ex.Message;
+
+                if (msg.Contains("Phone"))
+                    ModelState.AddModelError("Phone", "Số điện thoại đã tồn tại");
+                else if (msg.Contains("Identity"))
+                    ModelState.AddModelError("IdentityNumber", "CMND/CCCD đã tồn tại");
+                else if (msg.Contains("Email"))
+                    ModelState.AddModelError("Email", "Email đã được sử dụng");
+                else
+                    ModelState.AddModelError("", "Lỗi hệ thống: " + msg);
+
+                return View(customer);
+            }
         }
 
         [HttpGet]

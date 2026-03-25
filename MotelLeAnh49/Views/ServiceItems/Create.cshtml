@@ -8,8 +8,7 @@
     body {
         font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         background: #f5f7fa;
-        margin: 0;
-        padding: 20px;
+        margin: 0
     }
 
     .form-container {
@@ -71,6 +70,20 @@
             box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
         }
 
+        /* Input lỗi highlight đỏ */
+        input.input-validation-error,
+        textarea.input-validation-error {
+            border-color: #e74c3c !important;
+            background: #fff8f8;
+        }
+
+    .field-validation-error {
+        color: #e74c3c;
+        font-size: 12.5px;
+        margin-top: 5px;
+        display: block;
+    }
+
     .checkbox-group {
         display: flex;
         align-items: center;
@@ -121,16 +134,15 @@
 <div class="form-container">
     <h2>➕ Thêm dịch vụ mới</h2>
 
-    <!-- ✅ FIX: thêm enctype -->
     <form asp-action="Create" method="post" enctype="multipart/form-data">
         @Html.AntiForgeryToken()
 
-        <div asp-validation-summary="ModelOnly" class="validation-summary"></div>
+        <div asp-validation-summary="All" class="validation-summary"></div>
 
         <div class="form-group">
             <label>Tên dịch vụ</label>
             <input asp-for="Name" placeholder="VD: Nước suối, Giặt ủi..." />
-            <span asp-validation-for="Name" class="validation-error"></span>
+            <span asp-validation-for="Name" class="field-validation-error"></span>
         </div>
 
         <div class="form-group">
@@ -140,20 +152,27 @@
 
         <div class="form-group">
             <label>Giá (VNĐ)</label>
-            <input asp-for="Price" type="number" value="" />
-            <span asp-validation-for="Price" class="validation-error"></span>
+            <input asp-for="Price" type="number" min="1" placeholder="VD: 10000" />
+            
+            <span asp-validation-for="Price" class="field-validation-error"></span>
         </div>
 
-        <!-- 🔥 UPLOAD ẢNH TỪ MÁY -->
         <div class="form-group">
-            <label>Ảnh dịch vụ</label>
+            <label>Ảnh dịch vụ <span style="color:#e74c3c">*</span></label>
             <input type="file" name="ImageFile" accept="image/*" />
+            
+                    @if (ViewData.ModelState["ImageFile"]?.Errors.Count > 0)
+                    {
+                <span class="field-validation-error">
+                            @ViewData.ModelState["ImageFile"]!.Errors[0].ErrorMessage
+                </span>
+                    }
             <img id="preview" class="preview-img" />
         </div>
 
         <div class="form-group checkbox-group">
-            <input asp-for="IsAvailable" type="checkbox" />
-            <label>Sẵn sàng kinh doanh</label>
+            <input asp-for="IsAvailable" type="checkbox" style="width:auto" />
+            <label style="margin-bottom:0">Sẵn sàng kinh doanh</label>
         </div>
 
         <div class="button-group">
@@ -169,23 +188,21 @@
     }
 
     <script>
-        // 🔥 preview ảnh từ máy
+        // Preview ảnh từ máy
         const input = document.querySelector('input[name="ImageFile"]');
         const preview = document.getElementById("preview");
 
         input.addEventListener("change", function () {
             const file = this.files[0];
-
             if (file) {
                 preview.src = URL.createObjectURL(file);
                 preview.style.display = "block";
             }
         });
 
-        // validation chỉ hiện khi submit
+        // Chỉ hiện validation summary sau khi submit
         const form = document.querySelector("form");
         const summary = document.querySelector(".validation-summary");
-
         summary.style.display = "none";
 
         form.addEventListener("submit", function () {

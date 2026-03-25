@@ -17,5 +17,6 @@ namespace BusinessLogic.Interfaces
         void AddServiceToBooking(int bookingId, int serviceId, int quantity);
         void RemoveServiceFromBooking(int id);
         decimal CalculateTotalServiceCost(int bookingId);
+        bool IsNameDuplicate(string name, int? excludeId = null);
     }
 }

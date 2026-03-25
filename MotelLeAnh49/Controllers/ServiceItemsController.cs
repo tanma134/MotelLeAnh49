@@ -30,33 +30,33 @@ namespace MotelLeAnh49.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(ServiceItem serviceItem, IFormFile ImageFile)
         {
-            if (ModelState.IsValid)
-            {
-                if (ImageFile != null && ImageFile.Length > 0)
-                {
-                    var folderPath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot/images/services");
+            // ── 1. Validate giá hợp lệ ──
+            if (serviceItem.Price <= 0)
+                ModelState.AddModelError("Price", "⚠️ Giá dịch vụ phải lớn hơn 0.");
 
-                    if (!Directory.Exists(folderPath))
-                    {
-                        Directory.CreateDirectory(folderPath);
-                    }
+            // ── 2. Bắt buộc upload ảnh khi tạo mới ──
+            if (ImageFile == null || ImageFile.Length == 0)
+                ModelState.AddModelError("ImageFile", "⚠️ Vui lòng upload ảnh cho dịch vụ.");
 
-                    var fileName = Guid.NewGuid().ToString() + Path.GetExtension(ImageFile.FileName);
-                    var filePath = Path.Combine(folderPath, fileName);
+            // ── 3. Bắt trùng tên ──
+            if (!string.IsNullOrWhiteSpace(serviceItem.Name)
+                && _serviceItemService.IsNameDuplicate(serviceItem.Name))
+                ModelState.AddModelError("Name", "⚠️ Tên dịch vụ này đã tồn tại.");
 
-                    using (var stream = new FileStream(filePath, FileMode.Create))
-                    {
-                        await ImageFile.CopyToAsync(stream);
-                    }
+            if (!ModelState.IsValid)
+                return View(serviceItem);
 
-                    serviceItem.ImageUrl = "/images/services/" + fileName;
-                }
+            // Upload ảnh
+            var folderPath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot/images/services");
+            Directory.CreateDirectory(folderPath);
+            var fileName = Guid.NewGuid() + Path.GetExtension(ImageFile!.FileName);
+            var filePath = Path.Combine(folderPath, fileName);
+            using (var stream = new FileStream(filePath, FileMode.Create))
+                await ImageFile.CopyToAsync(stream);
 
-                _serviceItemService.CreateService(serviceItem);
-                return RedirectToAction(nameof(Index));
-            }
-
-            return View(serviceItem);
+            serviceItem.ImageUrl = "/images/services/" + fileName;
+            _serviceItemService.CreateService(serviceItem);
+            return RedirectToAction(nameof(Index));
         }
 
         // GET: ServiceItems/Edit/5
@@ -74,32 +74,31 @@ namespace MotelLeAnh49.Controllers
             var existing = _serviceItemService.GetServiceById(serviceItem.ServiceItemId);
             if (existing == null) return NotFound();
 
+            // ── 1. Validate giá hợp lệ ──
+            if (serviceItem.Price <= 0)
+                ModelState.AddModelError("Price", "⚠️ Giá dịch vụ phải lớn hơn 0.");
+
+            // ── 2. Bắt trùng tên (trừ chính nó) ──
+            if (!string.IsNullOrWhiteSpace(serviceItem.Name)
+                && _serviceItemService.IsNameDuplicate(serviceItem.Name, serviceItem.ServiceItemId))
+                ModelState.AddModelError("Name", "⚠️ Tên dịch vụ này đã tồn tại.");
+
             if (!ModelState.IsValid)
             {
-                // 🔥 giữ ảnh khi validate fail
-                serviceItem.ImageUrl = existing.ImageUrl;
+                serviceItem.ImageUrl = existing.ImageUrl; // giữ ảnh cũ khi lỗi
                 return View(serviceItem);
             }
 
-            // 🔥 mặc định lấy ảnh cũ
+            // Giữ ảnh cũ, overwrite nếu upload mới
             serviceItem.ImageUrl = existing.ImageUrl;
-
             if (ImageFile != null && ImageFile.Length > 0)
             {
                 var folderPath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot/images/services");
-
-                if (!Directory.Exists(folderPath))
-                {
-                    Directory.CreateDirectory(folderPath);
-                }
-
-                var fileName = Guid.NewGuid().ToString() + Path.GetExtension(ImageFile.FileName);
+                Directory.CreateDirectory(folderPath);
+                var fileName = Guid.NewGuid() + Path.GetExtension(ImageFile.FileName);
                 var filePath = Path.Combine(folderPath, fileName);
-
                 using (var stream = new FileStream(filePath, FileMode.Create))
-                {
                     await ImageFile.CopyToAsync(stream);
-                }
 
                 serviceItem.ImageUrl = "/images/services/" + fileName;
             }
