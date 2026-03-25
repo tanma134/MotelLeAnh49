@@ -37,6 +37,7 @@ namespace BusinessLogic.Service
         {
             // 🔹 Rooms
             var rooms = (await _roomRepo.GetAvailableRoomsAsync()).Take(5);
+            bool noRooms = !rooms.Any();
             var roomData = string.Join("\n", rooms.Select(r =>
         $"""
 Room {r.RoomNumber}
@@ -49,9 +50,15 @@ Room {r.RoomNumber}
 - Phí nếu thêm 1 khách: {r.ExtraGuestFee} VND
 """
         ));
+            if (noRooms)
+            {
+                roomData = "Hiện tại KHÔNG còn phòng trống.";
+            }
+
 
             // 🔹 Events
             var events = (await _eventRepo.GetUpcomingEventsAsync()).Take(5);
+            bool noEvents = !events.Any();
             var eventData = string.Join("\n", events.Select(e =>
         $"""
 Sự kiện: {e.Title}
@@ -59,15 +66,25 @@ Sự kiện: {e.Title}
 - Ngày: {e.EventDate:dd/MM/yyyy}
 """
         ));
+            if (noEvents)
+            {
+                eventData = "Hiện tại KHÔNG có sự kiện nào.";
+            }
+           
 
             // 🔹 Services
             var services = (await _serviceItemRepo.GetAvailableServicesAsync()).Take(5);
+            bool noServices = !services.Any();
             var serviceData = string.Join("\n", services.Select(s =>
         $"""
 Dịch vụ: {s.Name}
 - Giá: {s.Price} VND
 """
         ));
+            if (noServices)
+            {
+                serviceData = "Hiện tại KHÔNG có dịch vụ nào.";
+            }
 
             // 🔹 Lịch sử chat (CHỈ của user này)
             string historyData = "";
@@ -161,6 +178,7 @@ QUY TẮC:
 - Khi có lịch sử đặt phòng, có thể tham khảo thông tin để trả lời các câu hỏi liên quan.
 - Trả lời tự nhiên, thân thiện, bằng tiếng Việt.
 - Nếu phù hợp hãy gợi ý phòng, dịch vụ hoặc sự kiện
+- - Nếu thấy "KHÔNG còn phòng trống, KHÔNG có event, KHÔNG có service" thì phải thông báo lại cho khách, không hỏi thêm.
 """;
 
             var aiResponse = await _openAI.SendPromptAsync(prompt);

@@ -170,10 +170,9 @@
 
         <div class="form-group">
             <label>Số CCCD / CMND</label>
-            <input asp-for="IdentityNumber" placeholder="Nhập số định danh..." />
+            <input asp-for="IdentityNumber" readonly />
             <span asp-validation-for="IdentityNumber" class="validation-error"></span>
         </div>
-
         <div class="button-group">
             <button type="submit">✅ Lưu thay đổi</button>
             <a asp-controller="Customers" asp-action="Index" class="btn-back">⬅ Quay lại</a>
